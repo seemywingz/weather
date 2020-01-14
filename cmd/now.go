@@ -48,7 +48,8 @@ func now() {
 	if locationArg == "" {
 		location = getLocationDataFromIP()
 	} else {
-		location = searchLocationData(locationArg)
+		// location = searchLocationData(locationArg)
+		location = geoLocate(locationArg)
 	}
 	weather := getWeatherData(location.Latitude, location.Longitude)
 

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -39,10 +40,112 @@ func getWeatherData(lat, long float32) WeatherResponse {
 
 func display(weather WeatherData, location Location) {
 	fmt.Println()
-	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.RegionCode, location.PostalCode)
+	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
 	fmt.Println("     Weather:", weather.Summary)
 	fmt.Printf("        Temp: %v°\n", weather.Temperature)
 	fmt.Printf("  Feels Like: %v°\n", weather.ApparentTemperature)
+}
+
+func getLocationDataFromIP() Location {
+
+	url := "https://telize.j3ss.co/geoip"
+	res, err := http.Get(url)
+	EoE("Error Getting Location Data", err)
+
+	responseData, err := ioutil.ReadAll(res.Body)
+	EoE("Error Reading Location Data", err)
+
+	locationData := GeoLocationData{}
+	json.Unmarshal(responseData, &locationData)
+
+	return Location{
+		locationData.City,
+		locationData.Region,
+		locationData.RegionCode,
+		locationData.PostalCode,
+		locationData.Country,
+		locationData.CountryCode,
+		locationData.Timezone,
+		locationData.Latitude,
+		locationData.Longitude,
+	}
+
+}
+
+func searchLocationData(locationArg string) Location {
+
+	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + locationArg
+	res, err := http.Get(url)
+	EoE("Error Getting Location Data", err)
+
+	responseData, err := ioutil.ReadAll(res.Body)
+	EoE("Error Reading Location Data", err)
+
+	locationResponse := LocationResponse{}
+	json.Unmarshal(responseData, &locationResponse)
+
+	if locationResponse.Nhits < 1 {
+		EoE("Sorry, Could Not Find Weather Data Fror Location: "+locationArg, errors.New(""))
+	}
+
+	loc := locationResponse.Records[0].Fields
+
+	return Location{
+		loc.City,
+		loc.State,
+		loc.State,
+		loc.Zip,
+		"",
+		"",
+		string(loc.Timezone),
+		loc.Latitude,
+		loc.Longitude,
+	}
+
+}
+
+func geoLocate(location string) Location {
+
+	url := "https://geocode.jessfraz.com/geocode"
+
+	reqBody, _ := json.Marshal(map[string]string{
+		"Location": location,
+	})
+
+	res, err := http.Post(url, "application/json", bytes.NewBuffer(reqBody))
+	EoE("Error Getting GeoLocation Response", err)
+
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+
+	locationData := GeoLocationData{}
+	json.Unmarshal(body, &locationData)
+
+	return Location{
+		locationData.City,
+		locationData.Region,
+		locationData.RegionCode,
+		locationData.PostalCode,
+		locationData.Country,
+		locationData.CountryCode,
+		locationData.Timezone,
+		locationData.Latitude,
+		locationData.Longitude,
+	}
+
+}
+
+// SendRequest : send http request to provided url
+func SendRequest(req *http.Request) []byte {
+	client := http.Client{}
+	res, err := client.Do(req)
+	EoE("Error Getting HTTP Response", err)
+	defer res.Body.Close()
+
+	resData, err := ioutil.ReadAll(res.Body)
+	EoE("Error Parsing HTTP Response", err)
+	return resData
 }
 
 func epochFormat(seconds int64) string {
@@ -102,62 +205,4 @@ func getPubIP() string {
 	ip, err := ioutil.ReadAll(resp.Body)
 	EoE("Error Reading IP Address", err)
 	return string(ip)
-}
-
-func getLocationDataFromIP() Location {
-
-	url := "https://telize.j3ss.co/geoip"
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	responseData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	locationData := GeoLocationData{}
-	json.Unmarshal(responseData, &locationData)
-
-	return Location{
-		locationData.City,
-		locationData.Region,
-		locationData.RegionCode,
-		locationData.PostalCode,
-		locationData.Country,
-		locationData.CountryCode,
-		locationData.Timezone,
-		locationData.Latitude,
-		locationData.Longitude,
-	}
-
-}
-
-func searchLocationData(locationArg string) Location {
-
-	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + locationArg
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	responseData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	locationResponse := LocationResponse{}
-	json.Unmarshal(responseData, &locationResponse)
-
-	if locationResponse.Nhits < 1 {
-		EoE("Sorry, Could Not Find Weather Data Fror Location: "+locationArg, errors.New(""))
-	}
-
-	loc := locationResponse.Records[0].Fields
-
-	return Location{
-		loc.City,
-		loc.State,
-		loc.State,
-		loc.Zip,
-		"",
-		"",
-		string(loc.Timezone),
-		loc.Latitude,
-		loc.Longitude,
-	}
-
 }
