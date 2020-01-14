@@ -21,11 +21,7 @@
 package cmd
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/spf13/cobra"
 )
@@ -43,60 +39,18 @@ var nowCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		now()
+
+		location := getLocationData(zip)
+		weather := getWeatherData(location.Latitude, location.Longitude)
+
+		display(weather.Currently, location)
 	},
 }
 
 func init() {
-}
 
-func display(weather WeatherData, location LocationData) {
-	fmt.Println("\nCurrent Weather in Your Location:", weather.Summary)
-	fmt.Println("        City:", location.City)
-	fmt.Println("         Zip:", location.Zip)
-	fmt.Println("        Temp:", weather.Temperature)
-	fmt.Println("  Feels Like:", weather.ApparentTemperature)
-}
-
-func now() {
-	location := getLocationData(zip)
-	weather := getWeatherData(location.Latitude, location.Longitude)
-
-	display(weather.Currently, location)
-}
-
-func getWeatherData(lat, long float32) WeatherResponse {
-
-	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	resData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	weatherResponse := WeatherResponse{}
-	json.Unmarshal(resData, &weatherResponse)
-
-	return weatherResponse
-
-}
-
-func getLocationData(zip string) LocationData {
-
-	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + zip
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	responseData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	locationResponse := LocationResponse{}
-	json.Unmarshal(responseData, &locationResponse)
-
-	if locationResponse.Nhits < 1 {
-		EoE("Sorry, Could Not Find Weather Data Fror ZIP: "+zip, errors.New(""))
+	if imperialUnits {
+		fmt.Println("Using imperial units")
+		units = "us"
 	}
-
-	return locationResponse.Records[0].Fields
-
 }
