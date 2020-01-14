@@ -42,3 +42,17 @@ var UnitFormats = map[string]UnitMeasures{
 		Precipitation: "mm/h",
 	},
 }
+
+// Icons emoji used to represent current weather
+var Icons = map[string]string{
+	"rain":                "🌧",
+	"clear-day":           "☀️",
+	"clear-night":         "🌙",
+	"snow":                "🌨☃️",
+	"sleet":               "🌧🥶",
+	"wind":                "💨",
+	"fog":                 "🌫",
+	"cloudy":              "🌥",
+	"partly-cloudy-day":   "🌤",
+	"partly-cloudy-night": "☁🌙",
+}

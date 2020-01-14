@@ -53,5 +53,5 @@ func now() {
 	}
 	weather := getWeatherData(location.Latitude, location.Longitude)
 
-	display(weather.Currently, location)
+	display(weather.Currently, location, weather.Alerts)
 }
