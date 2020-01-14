@@ -46,10 +46,7 @@ var rootCmd = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		location := getLocationData(zip)
-		weather := getWeatherData(location.Latitude, location.Longitude)
-
-		display(weather.Currently, location)
+		now()
 
 		fmt.Println("Public IP", getPubIP())
 	},
@@ -73,9 +70,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&zip, "zip", "z", "", "Zipcode to gather weather info for")
 }
 
-func display(weather WeatherData, location LocationData) {
+func display(weather WeatherData, location Location) {
 	fmt.Println()
-	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.State, location.Zip)
+	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.RegionCode, location.PostalCode)
 	fmt.Println("     Weather:", weather.Summary)
 	fmt.Printf("        Temp: %v°\n", weather.Temperature)
 	fmt.Printf("  Feels Like: %v°\n", weather.ApparentTemperature)

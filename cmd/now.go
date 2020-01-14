@@ -37,13 +37,14 @@ var nowCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-
-		location := getLocationData(zip)
-		weather := getWeatherData(location.Latitude, location.Longitude)
-
-		display(weather.Currently, location)
+		now()
 	},
 }
 
-func init() {
+func now() {
+
+	location := getLocationDataFromIP()
+	weather := getWeatherData(location.Latitude, location.Longitude)
+
+	display(weather.Currently, location)
 }
