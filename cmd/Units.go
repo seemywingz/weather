@@ -52,7 +52,7 @@ var Icons = map[string]string{
 	"sleet":               "🌧🥶",
 	"wind":                "💨",
 	"fog":                 "🌫",
-	"cloudy":              "🌥",
+	"cloudy":              "☁",
 	"partly-cloudy-day":   "🌤",
 	"partly-cloudy-night": "☁🌙",
 }
