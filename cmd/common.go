@@ -6,22 +6,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
 )
 
-var verbose,
-	imperialUnits bool
-
+var verbose bool
 var units string = "si"
 var locationArg string
 
 func getWeatherData(lat, long float32) WeatherResponse {
-
-	if imperialUnits {
-		units = "us"
-	}
 
 	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
 	res, err := http.Get(url)
@@ -42,15 +37,26 @@ func display(weather WeatherData, location GeoLocationData, alerts []WeatherAler
 	icon := Icons[weather.Icon]
 
 	fmt.Println()
-	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
-	fmt.Printf("     Weather: %v  %v %v\n", icon, weather.Summary, icon)
-	fmt.Printf("        Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
-	fmt.Printf("  Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
-	fmt.Printf("    Humidity: %v%%\n", weather.Humidity*100)
+	fmt.Printf("      Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
+	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
+	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
+	fmt.Printf("          Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
+	fmt.Printf("    Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
+	fmt.Printf("      Humidity: %v%%\n", weather.Humidity*100)
+	fmt.Printf("          Wind: %v%v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
+	if weather.PrecipProbability > 0 || verbose {
+		fmt.Printf("   Precip Prob: %v%%\n", weather.PrecipProbability)
+		fmt.Printf("        Precip: %v%v\n", weather.PrecipIntensity, unitFormat.Precipitation)
+	}
 
 	for _, alert := range alerts {
-		fmt.Printf("⚠️%v⚠️: %v\n", alert.Title, alert.Description)
+		fmt.Printf("\n      ⚠️  %v ⚠️\n %v\n", alert.Title, alert.Description)
 	}
+}
+
+func getBearings(degrees float64) string {
+	index := int(math.Mod((degrees+11.25)/22.5, 16))
+	return Directions[index]
 }
 
 func getLocationDataFromIP() GeoLocationData {
@@ -105,7 +111,7 @@ func SendRequest(req *http.Request) []byte {
 
 func epochFormat(seconds int64) string {
 	epochTime := time.Unix(0, seconds*int64(time.Second))
-	return epochTime.Format("January 2 at 3:04pm MST")
+	return epochTime.Format("January 2, 3:04pm MST")
 }
 
 func epochFormatDate(seconds int64) string {

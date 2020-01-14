@@ -49,10 +49,15 @@ var Icons = map[string]string{
 	"clear-day":           "☀️",
 	"clear-night":         "🌙",
 	"snow":                "🌨☃️",
-	"sleet":               "🌧🥶",
+	"sleet":               "❆🌧❅",
 	"wind":                "💨",
 	"fog":                 "🌫",
 	"cloudy":              "☁",
 	"partly-cloudy-day":   "🌤",
 	"partly-cloudy-night": "☁🌙",
+}
+
+// Directions contain all the combinations of N,S,E,W
+var Directions = []string{
+	"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
 }

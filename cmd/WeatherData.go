@@ -15,30 +15,30 @@ type WeatherAlert struct {
 	Title       string `json:""`
 	Time        int    `json:"time"`
 	Expires     int    `json:"expires"`
-	Description string `json:"descrion"`
+	Description string `json:"description"`
 	URI         string `json:"uri"`
 }
 
 // WeatherData : Struct containg json data from DarkSky API
 type WeatherData struct {
-	Time                 int     `json:"time"`
+	Time                 int64   `json:"time"`
 	Summary              string  `json:"summary"`
 	Icon                 string  `json:"icon"`
 	NearestStormDistance int     `json:"nearestStormDistance"`
-	PrecipIntensity      float32 `json:"precipIntensity"`
-	PrecipIntensityError float32 `json:"precipIntensityError"`
-	PrecipProbability    float32 `json:"precipProbability"`
+	PrecipIntensity      float64 `json:"precipIntensity"`
+	PrecipIntensityError float64 `json:"precipIntensityError"`
+	PrecipProbability    float64 `json:"precipProbability"`
 	PrecipType           string  `json:"precipType"`
-	Temperature          float32 `json:"temperature"`
-	ApparentTemperature  float32 `json:"apparentTemperature"`
-	DewPoint             float32 `json:"dewPoint"`
-	Humidity             float32 `json:"humidity"`
-	Pressure             float32 `json:"pressure"`
-	WindSpeed            float32 `json:"windSpeed"`
-	WindGust             float32 `json:"windGust"`
-	WindBearing          float32 `json:"windBearing"`
-	CloudCover           float32 `json:"cloudCover"`
-	UvIndex              float32 `json:"uvIndex"`
-	Visibility           float32 `json:"visibility"`
-	Ozone                float32 `json:"ozone"`
+	Temperature          float64 `json:"temperature"`
+	ApparentTemperature  float64 `json:"apparentTemperature"`
+	DewPoint             float64 `json:"dewPoint"`
+	Humidity             float64 `json:"humidity"`
+	Pressure             float64 `json:"pressure"`
+	WindSpeed            float64 `json:"windSpeed"`
+	WindGust             float64 `json:"windGust"`
+	WindBearing          float64 `json:"windBearing"`
+	CloudCover           float64 `json:"cloudCover"`
+	UvIndex              float64 `json:"uvIndex"`
+	Visibility           float64 `json:"visibility"`
+	Ozone                float64 `json:"ozone"`
 }
