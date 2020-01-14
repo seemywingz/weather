@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,47 +11,38 @@ import (
 	"time"
 )
 
-// UnitMeasures are the location specific terms for weather data.
-type UnitMeasures struct {
-	Degrees       string
-	Speed         string
-	Length        string
-	Precipitation string
+var verbose,
+	imperialUnits bool
+
+var units string = "si"
+var zip string
+
+func getWeatherData(lat, long float32) WeatherResponse {
+
+	if imperialUnits {
+		units = "us"
+	}
+
+	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
+	res, err := http.Get(url)
+	EoE("Error Getting Location Data", err)
+
+	resData, err := ioutil.ReadAll(res.Body)
+	EoE("Error Reading Location Data", err)
+
+	weatherResponse := WeatherResponse{}
+	json.Unmarshal(resData, &weatherResponse)
+
+	return weatherResponse
+
 }
 
-// UnitFormats describe each regions UnitMeasures.
-var UnitFormats = map[string]UnitMeasures{
-	"us": {
-		Degrees:       "°F",
-		Speed:         "mph",
-		Length:        "miles",
-		Precipitation: "in/hr",
-	},
-	"si": {
-		Degrees:       "°C",
-		Speed:         "m/s",
-		Length:        "kilometers",
-		Precipitation: "mm/h",
-	},
-	"ca": {
-		Degrees:       "°C",
-		Speed:         "km/h",
-		Length:        "kilometers",
-		Precipitation: "mm/h",
-	},
-	// deprecated, use "uk2" in stead
-	"uk": {
-		Degrees:       "°C",
-		Speed:         "mph",
-		Length:        "kilometers",
-		Precipitation: "mm/h",
-	},
-	"uk2": {
-		Degrees:       "°C",
-		Speed:         "mph",
-		Length:        "miles",
-		Precipitation: "mm/h",
-	},
+func display(weather WeatherData, location Location) {
+	fmt.Println()
+	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.RegionCode, location.PostalCode)
+	fmt.Println("     Weather:", weather.Summary)
+	fmt.Printf("        Temp: %v°\n", weather.Temperature)
+	fmt.Printf("  Feels Like: %v°\n", weather.ApparentTemperature)
 }
 
 func epochFormat(seconds int64) string {
@@ -135,5 +127,30 @@ func getLocationDataFromIP() Location {
 		locationData.Latitude,
 		locationData.Longitude,
 	}
+
+}
+
+func searchLocationData(zip string) LocationData {
+
+	if zip == "" {
+		zip = "12569"
+		fmt.Println("Using Default Zipcode:", zip)
+	}
+
+	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + zip
+	res, err := http.Get(url)
+	EoE("Error Getting Location Data", err)
+
+	responseData, err := ioutil.ReadAll(res.Body)
+	EoE("Error Reading Location Data", err)
+
+	locationResponse := LocationResponse{}
+	json.Unmarshal(responseData, &locationResponse)
+
+	if locationResponse.Nhits < 1 {
+		EoE("Sorry, Could Not Find Weather Data Fror ZIP: "+zip, errors.New(""))
+	}
+
+	return locationResponse.Records[0].Fields
 
 }
