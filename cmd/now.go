@@ -43,7 +43,13 @@ var nowCmd = &cobra.Command{
 
 func now() {
 
-	location := getLocationDataFromIP()
+	var location Location
+
+	if locationArg == "" {
+		location = getLocationDataFromIP()
+	} else {
+		location = searchLocationData(locationArg)
+	}
 	weather := getWeatherData(location.Latitude, location.Longitude)
 
 	display(weather.Currently, location)

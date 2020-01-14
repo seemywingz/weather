@@ -54,6 +54,6 @@ func init() {
 	// cobra.OnInitialize(initConfig)
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
-	rootCmd.PersistentFlags().StringVarP(&units, "units", "", "si", "System of units (e.g. auto, us, si, ca, uk2) (default: si)")
-	rootCmd.PersistentFlags().StringVarP(&zip, "zip", "z", "", "Zipcode to gather weather info for")
+	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "si", "System of units (e.g. auto, us, si, ca, uk2) (default: si)")
+	rootCmd.PersistentFlags().StringVarP(&locationArg, "location", "l", "", "Location to Report Weather Status")
 }

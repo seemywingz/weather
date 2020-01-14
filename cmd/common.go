@@ -15,7 +15,7 @@ var verbose,
 	imperialUnits bool
 
 var units string = "si"
-var zip string
+var locationArg string
 
 func getWeatherData(lat, long float32) WeatherResponse {
 
@@ -130,14 +130,9 @@ func getLocationDataFromIP() Location {
 
 }
 
-func searchLocationData(zip string) LocationData {
+func searchLocationData(locationArg string) Location {
 
-	if zip == "" {
-		zip = "12569"
-		fmt.Println("Using Default Zipcode:", zip)
-	}
-
-	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + zip
+	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + locationArg
 	res, err := http.Get(url)
 	EoE("Error Getting Location Data", err)
 
@@ -148,9 +143,21 @@ func searchLocationData(zip string) LocationData {
 	json.Unmarshal(responseData, &locationResponse)
 
 	if locationResponse.Nhits < 1 {
-		EoE("Sorry, Could Not Find Weather Data Fror ZIP: "+zip, errors.New(""))
+		EoE("Sorry, Could Not Find Weather Data Fror Location: "+locationArg, errors.New(""))
 	}
 
-	return locationResponse.Records[0].Fields
+	loc := locationResponse.Records[0].Fields
+
+	return Location{
+		loc.City,
+		loc.State,
+		loc.State,
+		loc.Zip,
+		"",
+		"",
+		string(loc.Timezone),
+		loc.Latitude,
+		loc.Longitude,
+	}
 
 }
