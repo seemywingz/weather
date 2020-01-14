@@ -43,7 +43,7 @@ var nowCmd = &cobra.Command{
 
 func now() {
 
-	var location Location
+	var location GeoLocationData
 
 	if locationArg == "" {
 		location = getLocationDataFromIP()

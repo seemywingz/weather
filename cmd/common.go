@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -38,7 +37,7 @@ func getWeatherData(lat, long float32) WeatherResponse {
 
 }
 
-func display(weather WeatherData, location Location) {
+func display(weather WeatherData, location GeoLocationData) {
 	fmt.Println()
 	fmt.Printf("    Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
 	fmt.Println("     Weather:", weather.Summary)
@@ -46,7 +45,7 @@ func display(weather WeatherData, location Location) {
 	fmt.Printf("  Feels Like: %v°\n", weather.ApparentTemperature)
 }
 
-func getLocationDataFromIP() Location {
+func getLocationDataFromIP() GeoLocationData {
 
 	url := "https://telize.j3ss.co/geoip"
 	res, err := http.Get(url)
@@ -58,53 +57,11 @@ func getLocationDataFromIP() Location {
 	locationData := GeoLocationData{}
 	json.Unmarshal(responseData, &locationData)
 
-	return Location{
-		locationData.City,
-		locationData.Region,
-		locationData.RegionCode,
-		locationData.PostalCode,
-		locationData.Country,
-		locationData.CountryCode,
-		locationData.Timezone,
-		locationData.Latitude,
-		locationData.Longitude,
-	}
+	return locationData
 
 }
 
-func searchLocationData(locationArg string) Location {
-
-	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + locationArg
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	responseData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	locationResponse := LocationResponse{}
-	json.Unmarshal(responseData, &locationResponse)
-
-	if locationResponse.Nhits < 1 {
-		EoE("Sorry, Could Not Find Weather Data Fror Location: "+locationArg, errors.New(""))
-	}
-
-	loc := locationResponse.Records[0].Fields
-
-	return Location{
-		loc.City,
-		loc.State,
-		loc.State,
-		loc.Zip,
-		"",
-		"",
-		string(loc.Timezone),
-		loc.Latitude,
-		loc.Longitude,
-	}
-
-}
-
-func geoLocate(location string) Location {
+func geoLocate(location string) GeoLocationData {
 
 	url := "https://geocode.jessfraz.com/geocode"
 
@@ -122,19 +79,42 @@ func geoLocate(location string) Location {
 	locationData := GeoLocationData{}
 	json.Unmarshal(body, &locationData)
 
-	return Location{
-		locationData.City,
-		locationData.Region,
-		locationData.RegionCode,
-		locationData.PostalCode,
-		locationData.Country,
-		locationData.CountryCode,
-		locationData.Timezone,
-		locationData.Latitude,
-		locationData.Longitude,
-	}
+	return locationData
 
 }
+
+// func searchLocationData(locationArg string) GeoLocationData {
+
+// 	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + locationArg
+// 	res, err := http.Get(url)
+// 	EoE("Error Getting Location Data", err)
+
+// 	responseData, err := ioutil.ReadAll(res.Body)
+// 	EoE("Error Reading Location Data", err)
+
+// 	locationResponse := LocationResponse{}
+// 	json.Unmarshal(responseData, &locationResponse)
+
+// 	if locationResponse.Nhits < 1 {
+// 		EoE("Sorry, Could Not Find Weather Data Fror Location: "+locationArg, errors.New(""))
+// 	}
+
+// 	loc := locationResponse.Records[0].Fields
+
+// 	return GeoLocationData{
+// 		loc.City,
+// 		loc.Latitude,
+// 		loc.Longitude,
+// 		loc.State,
+// 		loc.State,
+// 		loc.Zip,
+// 		"",
+// 		"",
+// 		string(loc.Timezone),
+// 		"",
+// 	}
+
+// }
 
 // SendRequest : send http request to provided url
 func SendRequest(req *http.Request) []byte {
