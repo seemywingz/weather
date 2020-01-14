@@ -5,7 +5,18 @@ type WeatherResponse struct {
 	Currently WeatherData `json:"currently"`
 	Minutely  struct {
 		Summary string `json:"summary"`
+		Icon    string `json:"icon"`
 	} `json:"minutely"`
+	Alerts []WeatherAlert
+}
+
+// WeatherAlert : format for dark sky weather alert
+type WeatherAlert struct {
+	Title       string `json:""`
+	Time        int    `json:"time"`
+	Expires     int    `json:"expires"`
+	Description string `json:"descrion"`
+	URI         string `json:"uri"`
 }
 
 // WeatherData : Struct containg json data from DarkSky API
