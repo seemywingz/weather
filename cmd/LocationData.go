@@ -1,7 +1,7 @@
 package cmd
 
-// LocationData : Data returned from opendatasoft
-type LocationData struct {
+// LocationResponse : Data returned from opendatasoft
+type LocationResponse struct {
 	Nhits int `json:"nhits"`
 
 	Parameters struct {
@@ -13,13 +13,16 @@ type LocationData struct {
 	} `json:"parameters"`
 
 	Records []struct {
-		Fields struct {
-			City      string  `json:"city"`
-			Latitude  float32 `json:"latitude"`
-			Longitude float32 `json:"longitude"`
-			State     string  `json:"state"`
-			Zip       string  `json:"zip"`
-			Timezone  int     `json:"timezone"`
-		} `json:"fields"`
+		Fields LocationData `json:"fields"`
 	} `json:"records"`
+}
+
+// LocationData : Data returned from opendatasoft
+type LocationData struct {
+	City      string  `json:"city"`
+	Latitude  float32 `json:"latitude"`
+	Longitude float32 `json:"longitude"`
+	State     string  `json:"state"`
+	Zip       string  `json:"zip"`
+	Timezone  int     `json:"timezone"`
 }

@@ -27,7 +27,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var verbose bool
+var verbose,
+	imperialUnits bool
+
+var units string = "ca"
+var zip string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -52,6 +56,19 @@ func Execute() {
 
 func init() {
 	// cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
 	rootCmd.AddCommand(nowCmd)
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
+	rootCmd.PersistentFlags().BoolVarP(&imperialUnits, "imperial", "i", false, "Use Imperial Units")
+	rootCmd.PersistentFlags().BoolVarP(&imperialUnits, "fahrenheit", "f", false, "Use Imperial Units")
+	rootCmd.PersistentFlags().StringVarP(&zip, "zip", "z", "", "Zipcode to gather weather info for")
+
+	if verbose {
+		fmt.Println("Using imperial units")
+		units = "us"
+	}
+
+	if zip == "" {
+		zip = "12569"
+		fmt.Println("Using Default Zipcode:", zip)
+	}
 }
