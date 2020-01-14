@@ -50,6 +50,8 @@ var rootCmd = &cobra.Command{
 		weather := getWeatherData(location.Latitude, location.Longitude)
 
 		display(weather.Currently, location)
+
+		fmt.Println("Public IP", getPubIP())
 	},
 }
 
@@ -69,11 +71,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&imperialUnits, "imperial", "i", false, "Use Imperial Units")
 	rootCmd.PersistentFlags().BoolVarP(&imperialUnits, "fahrenheit", "f", false, "Use Imperial Units")
 	rootCmd.PersistentFlags().StringVarP(&zip, "zip", "z", "", "Zipcode to gather weather info for")
-
-	if zip == "" {
-		zip = "12569"
-		fmt.Println("Using Default Zipcode:", zip)
-	}
 }
 
 func display(weather WeatherData, location LocationData) {
@@ -85,6 +82,10 @@ func display(weather WeatherData, location LocationData) {
 }
 
 func getWeatherData(lat, long float32) WeatherResponse {
+
+	if imperialUnits {
+		units = "us"
+	}
 
 	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
 	res, err := http.Get(url)
@@ -101,6 +102,11 @@ func getWeatherData(lat, long float32) WeatherResponse {
 }
 
 func getLocationData(zip string) LocationData {
+
+	if zip == "" {
+		zip = "12569"
+		fmt.Println("Using Default Zipcode:", zip)
+	}
 
 	url := "https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=" + zip
 	res, err := http.Get(url)

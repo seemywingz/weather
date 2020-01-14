@@ -21,8 +21,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -48,9 +46,4 @@ var nowCmd = &cobra.Command{
 }
 
 func init() {
-
-	if imperialUnits {
-		fmt.Println("Using imperial units")
-		units = "us"
-	}
 }
