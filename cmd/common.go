@@ -46,6 +46,7 @@ func display(weather WeatherData, location GeoLocationData, alerts []WeatherAler
 	fmt.Printf("     Weather: %v  %v %v\n", icon, weather.Summary, icon)
 	fmt.Printf("        Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
 	fmt.Printf("  Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
+	fmt.Printf("    Humidity: %v%%\n", weather.Humidity*100)
 
 	for _, alert := range alerts {
 		fmt.Printf("⚠️%v⚠️: %v\n", alert.Title, alert.Description)
