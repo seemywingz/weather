@@ -54,6 +54,7 @@ func display(weather WeatherData) {
 	if verbose {
 		fmt.Printf("     Wind Gust: %v %v\n", weather.WindGust, unitFormat.Speed)
 		fmt.Printf("     Dew Point: %v%v\n", weather.DewPoint, unitFormat.Degrees)
+		fmt.Printf(" Nearest Storm: %v %v\n", weather.NearestStormDistance, unitFormat.Length)
 		fmt.Printf("      Pressure: %v hPa\n", weather.Pressure)
 		fmt.Printf("         Ozone: %v DU\n", weather.Ozone)
 		fmt.Printf("    Visibility: %v %v\n", weather.Visibility, unitFormat.Length)
@@ -61,7 +62,7 @@ func display(weather WeatherData) {
 	}
 }
 
-func displayDaily(weather WeatherData) {
+func displayDaily(weather DailyWeatherData) {
 	icon := Icons[weather.Icon]
 
 	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))

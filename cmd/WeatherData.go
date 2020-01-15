@@ -20,9 +20,9 @@ type WeatherResponse struct {
 		Data    []WeatherData `json:"data"`
 	} `json:"hourly"`
 	Daily struct {
-		Summary string        `json:"summary"`
-		Icon    string        `json:"icon"`
-		Data    []WeatherData `json:"data"`
+		Summary string             `json:"summary"`
+		Icon    string             `json:"icon"`
+		Data    []DailyWeatherData `json:"data"`
 	} `json:"daily"`
 	Alerts []WeatherAlert `json:"alerts"`
 	Flags  struct {
@@ -38,6 +38,32 @@ type WeatherData struct {
 	Time                 int64   `json:"time"`
 	Summary              string  `json:"summary"`
 	Icon                 string  `json:"icon"`
+	NearestStormDistance int     `json:"nearestStormDistance"`
+	PrecipIntensity      float64 `json:"precipIntensity"`
+	PrecipIntensityError float64 `json:"precipIntensityError"`
+	PrecipProbability    float64 `json:"precipProbability"`
+	PrecipType           string  `json:"precipType"`
+	Temperature          float64 `json:"temperature"`
+	ApparentTemperature  float64 `json:"apparentTemperature"`
+	DewPoint             float64 `json:"dewPoint"`
+	Humidity             float64 `json:"humidity"`
+	Pressure             float64 `json:"pressure"`
+	WindSpeed            float64 `json:"windSpeed"`
+	WindGust             float64 `json:"windGust"`
+	WindBearing          float64 `json:"windBearing"`
+	CloudCover           float64 `json:"cloudCover"`
+	UvIndex              float64 `json:"uvIndex"`
+	Visibility           float64 `json:"visibility"`
+	Ozone                float64 `json:"ozone"`
+}
+
+// DailyWeatherData : Struct containg json data from DarkSky API
+type DailyWeatherData struct {
+	Time                 int64   `json:"time"`
+	Summary              string  `json:"summary"`
+	Icon                 string  `json:"icon"`
+	sunriseTime          int64   `json:"sunriseTime"`
+	sunsetTime           int64   `json:"sunsetTime"`
 	NearestStormDistance int     `json:"nearestStormDistance"`
 	PrecipIntensity      float64 `json:"precipIntensity"`
 	PrecipIntensityError float64 `json:"precipIntensityError"`
