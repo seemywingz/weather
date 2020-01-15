@@ -6,13 +6,25 @@ type WeatherResponse struct {
 	Minutely  struct {
 		Summary string `json:"summary"`
 		Icon    string `json:"icon"`
+		Data    []struct {
+			Time                 int64   `json:"time"`
+			PrecipIntensity      float64 `json:"precipIntensity"`
+			PrecipIntensityError float64 `json:"precipIntensityError"`
+			PrecipProbability    float64 `json:"precipProbability"`
+			PrecipType           string  `json:"precipType"`
+		} `json:"minutely"`
 	} `json:"minutely"`
 	Hourly struct {
 		Summary string        `json:"summary"`
 		Icon    string        `json:"icon"`
 		Data    []WeatherData `json:"data"`
 	} `json:"hourly"`
-	Alerts []WeatherAlert
+	Daily struct {
+		Summary string        `json:"summary"`
+		Icon    string        `json:"icon"`
+		Data    []WeatherData `json:"data"`
+	} `json:"daily"`
+	Alerts []WeatherAlert `json:"alerts"`
 	Flags  struct {
 		Units          string `json:"units"`
 		Unavalable     string `json:"darksky-unavailable"`
@@ -47,7 +59,7 @@ type WeatherData struct {
 
 // WeatherAlert : format for dark sky weather alert
 type WeatherAlert struct {
-	Title       string `json:""`
+	Title       string `json:"title"`
 	Time        int    `json:"time"`
 	Expires     int    `json:"expires"`
 	Description string `json:"description"`

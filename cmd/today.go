@@ -22,42 +22,31 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "weather",
-	Short: "Weather CLI Tool",
+var todayCmd = &cobra.Command{
+	Use:   "today",
+	Short: "Display Today's Weather",
 	Long: `
 	
 	`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		// if len(args) < 1 {
+		// 	return errors.New("Must provide one argument")
+		// }
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-
-		weather, _ := gatherData()
-		icon := Icons[weather.Daily.Icon]
-		fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Daily.Summary, icon)
-
+		today()
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
+func today() {
 
-func init() {
-	// cobra.OnInitialize(initConfig)
-	rootCmd.AddCommand(nowCmd)
-	rootCmd.AddCommand(todayCmd)
-	rootCmd.AddCommand(hourlyCmd)
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
-	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "auto", "System of units (e.g. auto, us, si, ca, uk2)")
-	rootCmd.PersistentFlags().StringVarP(&locationArg, "location", "l", "", "Location to Report Weather Conditions Of")
+	weather, _ := gatherData()
+	icon := Icons[weather.Hourly.Icon]
+	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Hourly.Summary, icon)
+
 }
