@@ -66,10 +66,10 @@ type DailyWeatherData struct {
 	SunriseTime            int64   `json:"sunriseTime"`
 	SunsetTime             int64   `json:"sunsetTime"`
 	MoonPhase              float64 `json:"moonPhase"`
-	temperatureHigh        float64 `json:"temperatureHigh"`
-	temperatureHighTime    int     `json:"temperatureHighTime"`
-	temperatureLow         float64 `json:"temperatureLow"`
-	temperatureLowTime     int     `json:"temperatureLowTime"`
+	TemperatureHigh        float64 `json:"temperatureHigh"`
+	TemperatureHighTime    int     `json:"temperatureHighTime"`
+	TemperatureLow         float64 `json:"temperatureLow"`
+	TemperatureLowTime     int     `json:"temperatureLowTime"`
 	PrecipIntensity        float64 `json:"precipIntensity"`
 	PrecipProbability      float64 `json:"precipProbability"`
 	PrecipIntensityMax     float64 `json:"precipIntensityMax"`
