@@ -71,7 +71,7 @@ func displayDaily(weather DailyWeatherData) {
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
 	fmt.Printf("       Sunrise: %v\n", epochFormatTime(weather.SunriseTime))
 	fmt.Printf("        Sunset: %v\n", epochFormatTime(weather.SunsetTime))
-	fmt.Printf("    Moon Phase: %v\n", weather.MoonPhase)
+	fmt.Printf("    Moon Phase: %v\n", getMoonPhase(weather.MoonPhase))
 	fmt.Printf("          High: %v%v\n", weather.TemperatureHigh, unitFormat.Degrees)
 	fmt.Printf("           Low: %v%v\n", weather.TemperatureLow, unitFormat.Degrees)
 	if weather.PrecipProbability*100 > 1 {
@@ -117,6 +117,31 @@ func getWeatherData(lat, long float32) WeatherResponse {
 func getBearings(degrees float64) string {
 	index := int(math.Mod((degrees+11.25)/22.5, 16))
 	return Directions[index]
+}
+
+func getMoonPhase(phase float64) string {
+	var icon string
+
+	switch {
+	case phase == 0:
+		icon = "🌑"
+	case phase > 0 && phase < 0.25:
+		icon = "🌒"
+	case phase == 0.25:
+		icon = "🌓"
+	case phase > 0.25 && phase < 0.5:
+		icon = "🌔"
+	case phase == 0.5:
+		icon = "🌕"
+	case phase >= 0.5 && phase < 0.75:
+		icon = "🌖"
+	case phase == 0.75:
+		icon = "🌗"
+	case phase > 0.75:
+		icon = "🌘"
+	}
+
+	return icon
 }
 
 func getLocationDataFromIP() GeoLocationData {
