@@ -63,7 +63,7 @@ func display(weather WeatherData, alerts []WeatherAlert) {
 	fmt.Printf("      Humidity: %v%%\n", weather.Humidity*100)
 	fmt.Printf("   Cloud Cover: %v%%\n", weather.CloudCover*100)
 	fmt.Printf("          Wind: %v%v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
-	if weather.PrecipProbability > 0 || verbose {
+	if weather.PrecipProbability > 0.5 || verbose {
 		fmt.Printf("   Precip Prob: %v%%\n", weather.PrecipProbability)
 		fmt.Printf("        Precip: %v%v\n", weather.PrecipIntensity, unitFormat.Precipitation)
 	}
