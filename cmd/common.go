@@ -60,20 +60,20 @@ func display(weather WeatherData, alerts []WeatherAlert) {
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
 	fmt.Printf("          Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
 	fmt.Printf("    Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
+	if weather.PrecipProbability*100 > 1 {
+		fmt.Printf("     Chance of: %v %.2f%%\n", weather.PrecipType, weather.PrecipProbability*100)
+		fmt.Printf(" Precipitation: %v %v\n", weather.PrecipIntensity, unitFormat.Precipitation)
+	}
 	fmt.Printf("      Humidity: %.2f%%\n", weather.Humidity*100)
 	fmt.Printf("   Cloud Cover: %.2f%%\n", weather.CloudCover*100)
 	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
-	if weather.PrecipProbability*100 > 1 {
-		fmt.Printf(" Precipitation: %v %v\n", weather.PrecipIntensity, unitFormat.Precipitation)
-		fmt.Printf("   Precip Prob: %.2f%% chance of %v\n", weather.PrecipProbability*100, weather.PrecipType)
-	}
 	if verbose {
 		fmt.Printf("     Wind Gust: %v %v\n", weather.WindGust, unitFormat.Speed)
 		fmt.Printf("     Dew Point: %v%v\n", weather.DewPoint, unitFormat.Degrees)
 		fmt.Printf("      Pressure: %v hPa\n", weather.Pressure)
-		fmt.Printf("      UV Index: %v\n", weather.UvIndex)
 		fmt.Printf("         Ozone: %v DU\n", weather.Ozone)
 		fmt.Printf("    Visibility: %v %v\n", weather.Visibility, unitFormat.Length)
+		fmt.Printf("      UV Index: %v\n", weather.UvIndex)
 	}
 
 	for _, alert := range alerts {
