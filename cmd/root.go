@@ -56,5 +56,5 @@ func init() {
 	rootCmd.AddCommand(hourlyCmd)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
 	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "auto", "System of units (e.g. auto, us, si, ca, uk2)")
-	rootCmd.PersistentFlags().StringVarP(&locationArg, "location", "l", "", "Location to Report Weather Conditions Of")
+	rootCmd.PersistentFlags().StringVarP(&locationArg, "location", "l", "", "Location to Report Weather Conditions Of (e.g 12569, Beaverton, \"1600 Pennsylvania Ave\")")
 }
