@@ -56,6 +56,7 @@ func init() {
 	// cobra.OnInitialize(initConfig)
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(todayCmd)
+	rootCmd.AddCommand(dailyCmd)
 	rootCmd.AddCommand(hourlyCmd)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
 	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "auto", "System of units (e.g. auto, us, si, ca, uk2)")

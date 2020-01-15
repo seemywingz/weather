@@ -67,7 +67,7 @@ func display(weather WeatherData) {
 func displayDaily(weather DailyWeatherData) {
 	icon := Icons[weather.Icon]
 
-	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
+	fmt.Printf("          Date: %v\n", epochFormatDate(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
 	fmt.Printf("       Sunrise: %v\n", epochFormatTime(weather.SunriseTime))
 	fmt.Printf("        Sunset: %v\n", epochFormatTime(weather.SunsetTime))

@@ -21,12 +21,14 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-var todayCmd = &cobra.Command{
-	Use:   "today",
-	Short: "Display Today's Weather",
+var dailyCmd = &cobra.Command{
+	Use:   "daily",
+	Short: "Display 7 Day Weather Forecast",
 	Long: `
 	
 	`,
@@ -37,12 +39,19 @@ var todayCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		today()
+		daily()
 	},
 }
 
-func today() {
+func daily() {
+
 	weather, _ := gatherData()
-	displayDaily(weather.Daily.Data[0])
+	icon := Icons[weather.Daily.Icon]
+	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Daily.Summary, icon)
+
+	for _, data := range weather.Daily.Data {
+		displayDaily(data)
+		fmt.Println()
+	}
 	displayAlerts(weather.Alerts)
 }
