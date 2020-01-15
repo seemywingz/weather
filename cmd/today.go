@@ -21,8 +21,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -46,7 +44,5 @@ var todayCmd = &cobra.Command{
 func today() {
 
 	weather, _ := gatherData()
-	icon := Icons[weather.Hourly.Icon]
-	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Hourly.Summary, icon)
-
+	display(weather.Daily.Data[0], weather.Alerts)
 }
