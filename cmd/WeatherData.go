@@ -7,16 +7,18 @@ type WeatherResponse struct {
 		Summary string `json:"summary"`
 		Icon    string `json:"icon"`
 	} `json:"minutely"`
+	Hourly struct {
+		Summary string        `json:"summary"`
+		Icon    string        `json:"icon"`
+		Data    []WeatherData `json:"data"`
+	} `json:"hourly"`
 	Alerts []WeatherAlert
-}
-
-// WeatherAlert : format for dark sky weather alert
-type WeatherAlert struct {
-	Title       string `json:""`
-	Time        int    `json:"time"`
-	Expires     int    `json:"expires"`
-	Description string `json:"description"`
-	URI         string `json:"uri"`
+	Flags  struct {
+		Units          string `json:"units"`
+		Unavalable     string `json:"darksky-unavailable"`
+		NearestStation int64  `json:"nearest-station"`
+		Sources        string `json:"sources"`
+	} `json:"flags"`
 }
 
 // WeatherData : Struct containg json data from DarkSky API
@@ -41,4 +43,13 @@ type WeatherData struct {
 	UvIndex              float64 `json:"uvIndex"`
 	Visibility           float64 `json:"visibility"`
 	Ozone                float64 `json:"ozone"`
+}
+
+// WeatherAlert : format for dark sky weather alert
+type WeatherAlert struct {
+	Title       string `json:""`
+	Time        int    `json:"time"`
+	Expires     int    `json:"expires"`
+	Description string `json:"description"`
+	URI         string `json:"uri"`
 }

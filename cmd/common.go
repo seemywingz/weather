@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,12 +10,32 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"os/user"
 	"time"
 )
 
 var verbose bool
-var units string = "si"
 var locationArg string
+var units string
+var unitFormat UnitMeasures
+
+func gatherData() (WeatherResponse, GeoLocationData) {
+
+	var location GeoLocationData
+
+	if locationArg == "" {
+		location = getLocationDataFromIP()
+	} else {
+		location = geoLocate(locationArg)
+	}
+
+	weather := getWeatherData(location.Latitude, location.Longitude)
+	unitFormat = UnitFormats[weather.Flags.Units]
+
+	fmt.Println()
+	fmt.Printf("      Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
+	return weather, location
+}
 
 func getWeatherData(lat, long float32) WeatherResponse {
 
@@ -32,17 +53,15 @@ func getWeatherData(lat, long float32) WeatherResponse {
 
 }
 
-func display(weather WeatherData, location GeoLocationData, alerts []WeatherAlert) {
-	unitFormat := UnitFormats[units]
+func display(weather WeatherData, alerts []WeatherAlert) {
 	icon := Icons[weather.Icon]
 
-	fmt.Println()
-	fmt.Printf("      Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
 	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
 	fmt.Printf("          Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
 	fmt.Printf("    Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
 	fmt.Printf("      Humidity: %v%%\n", weather.Humidity*100)
+	fmt.Printf("   Cloud Cover: %v%%\n", weather.CloudCover*100)
 	fmt.Printf("          Wind: %v%v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
 	if weather.PrecipProbability > 0 || verbose {
 		fmt.Printf("   Precip Prob: %v%%\n", weather.PrecipProbability)
@@ -97,18 +116,6 @@ func geoLocate(location string) GeoLocationData {
 
 }
 
-// SendRequest : send http request to provided url
-func SendRequest(req *http.Request) []byte {
-	client := http.Client{}
-	res, err := client.Do(req)
-	EoE("Error Getting HTTP Response", err)
-	defer res.Body.Close()
-
-	resData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Parsing HTTP Response", err)
-	return resData
-}
-
 func epochFormat(seconds int64) string {
 	epochTime := time.Unix(0, seconds*int64(time.Second))
 	return epochTime.Format("January 2, 3:04pm MST")
@@ -150,20 +157,36 @@ func EoE(msg string, err error) {
 	}
 }
 
-// GetIP : get local ip address
-func getPubIP() string {
-	// we are using a pulib IP API, we're using ipify here, below are some others
-	// https://www.ipify.org
-	// http://myexternalip.com
-	// http://api.ident.me
-	// http://whatismyipaddress.com/api
-	// https://ifconfig.co
-	// https://ifconfig.me
-	url := "https://api.ipify.org?format=text"
-	resp, err := http.Get(url)
-	EoE("Error Getting IP Address", err)
-	defer resp.Body.Close()
-	ip, err := ioutil.ReadAll(resp.Body)
-	EoE("Error Reading IP Address", err)
-	return string(ip)
+// WriteVar : write gob to local folesystem
+func WriteVar(file string, data interface{}) error {
+	gobFile, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	encoder := gob.NewEncoder(gobFile)
+	encoder.Encode(data)
+	gobFile.Close()
+	return nil
+}
+
+// ReadVar : read gob from loacal filesystem
+func ReadVar(file string, object interface{}) error {
+	gobFile, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+	decoder := gob.NewDecoder(gobFile)
+	err = decoder.Decode(object)
+	gobFile.Close()
+	return nil
+}
+
+// GetHomeDir : returns a full path to user's home dorectory
+func GetHomeDir() string {
+	usr, err := user.Current()
+	EoE("Failed to get Current User", err)
+	if usr.HomeDir != "" {
+		return usr.HomeDir
+	}
+	return os.Getenv("HOME")
 }
