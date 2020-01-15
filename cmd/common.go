@@ -50,11 +50,13 @@ func display(weather WeatherData) {
 	}
 	fmt.Printf("      Humidity: %.2f%%\n", weather.Humidity*100)
 	fmt.Printf("   Cloud Cover: %.2f%%\n", weather.CloudCover*100)
+	if weather.NearestStormDistance > 0 {
+		fmt.Printf(" Nearest Storm: %v %v %v\n", weather.NearestStormDistance, unitFormat.Length, getBearings(weather.NearestStormBearing))
+	}
 	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
 	if verbose {
 		fmt.Printf("     Wind Gust: %v %v\n", weather.WindGust, unitFormat.Speed)
 		fmt.Printf("     Dew Point: %v%v\n", weather.DewPoint, unitFormat.Degrees)
-		fmt.Printf(" Nearest Storm: %v %v\n", weather.NearestStormDistance, unitFormat.Length)
 		fmt.Printf("      Pressure: %v hPa\n", weather.Pressure)
 		fmt.Printf("         Ozone: %v DU\n", weather.Ozone)
 		fmt.Printf("    Visibility: %v %v\n", weather.Visibility, unitFormat.Length)
@@ -67,7 +69,9 @@ func displayDaily(weather DailyWeatherData) {
 
 	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
-	fmt.Printf("          Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
+	fmt.Printf("       Sunrise: %v\n", epochFormatTime(weather.SunriseTime))
+	fmt.Printf("        Sunset: %v\n", epochFormatTime(weather.SunsetTime))
+	fmt.Printf("     Temp High: %v%v\n", weather.temperatureHigh, unitFormat.Degrees)
 	fmt.Printf("    Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
 	if weather.PrecipProbability*100 > 1 {
 		fmt.Printf("     Chance of: %v %.2f%%\n", weather.PrecipType, weather.PrecipProbability*100)
