@@ -44,5 +44,6 @@ var todayCmd = &cobra.Command{
 func today() {
 
 	weather, _ := gatherData()
-	display(weather.Daily.Data[0], weather.Alerts)
+	display(weather.Daily.Data[0])
+	displayAlerts(weather.Alerts)
 }

@@ -37,23 +37,31 @@ func gatherData() (WeatherResponse, GeoLocationData) {
 	return weather, location
 }
 
-func getWeatherData(lat, long float32) WeatherResponse {
+func display(weather WeatherData) {
+	icon := Icons[weather.Icon]
 
-	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	resData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	weatherResponse := WeatherResponse{}
-	json.Unmarshal(resData, &weatherResponse)
-
-	return weatherResponse
-
+	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
+	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
+	fmt.Printf("          Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
+	fmt.Printf("    Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
+	if weather.PrecipProbability*100 > 1 {
+		fmt.Printf("     Chance of: %v %.2f%%\n", weather.PrecipType, weather.PrecipProbability*100)
+		fmt.Printf(" Precipitation: %v %v\n", weather.PrecipIntensity, unitFormat.Precipitation)
+	}
+	fmt.Printf("      Humidity: %.2f%%\n", weather.Humidity*100)
+	fmt.Printf("   Cloud Cover: %.2f%%\n", weather.CloudCover*100)
+	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
+	if verbose {
+		fmt.Printf("     Wind Gust: %v %v\n", weather.WindGust, unitFormat.Speed)
+		fmt.Printf("     Dew Point: %v%v\n", weather.DewPoint, unitFormat.Degrees)
+		fmt.Printf("      Pressure: %v hPa\n", weather.Pressure)
+		fmt.Printf("         Ozone: %v DU\n", weather.Ozone)
+		fmt.Printf("    Visibility: %v %v\n", weather.Visibility, unitFormat.Length)
+		fmt.Printf("      UV Index: %v\n", weather.UvIndex)
+	}
 }
 
-func display(weather WeatherData, alerts []WeatherAlert) {
+func displayDaily(weather WeatherData) {
 	icon := Icons[weather.Icon]
 
 	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
@@ -76,9 +84,28 @@ func display(weather WeatherData, alerts []WeatherAlert) {
 		fmt.Printf("      UV Index: %v\n", weather.UvIndex)
 	}
 
+}
+
+func displayAlerts(alerts []WeatherAlert) {
 	for _, alert := range alerts {
 		fmt.Printf("\n      ⚠️  %v ⚠️\n %v\n", alert.Title, alert.Description)
 	}
+}
+
+func getWeatherData(lat, long float32) WeatherResponse {
+
+	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
+	res, err := http.Get(url)
+	EoE("Error Getting Location Data", err)
+
+	resData, err := ioutil.ReadAll(res.Body)
+	EoE("Error Reading Location Data", err)
+
+	weatherResponse := WeatherResponse{}
+	json.Unmarshal(resData, &weatherResponse)
+
+	return weatherResponse
+
 }
 
 func getBearings(degrees float64) string {

@@ -51,12 +51,17 @@ func init() {
 
 func hourly() {
 
+	if numHours > 48 {
+		EoE("Max Hours is 48", fmt.Errorf("Error: %v is too many hours", numHours))
+	}
+
 	weather, _ := gatherData()
 	icon := Icons[weather.Hourly.Icon]
 	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Hourly.Summary, icon)
 
 	for i := 0; i < numHours; i++ {
-		display(weather.Hourly.Data[i], nil)
+		display(weather.Hourly.Data[i])
 		fmt.Println()
 	}
+	displayAlerts(weather.Alerts)
 }
