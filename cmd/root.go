@@ -35,11 +35,7 @@ var rootCmd = &cobra.Command{
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		weather, _ := gatherData()
-		icon := Icons[weather.Daily.Icon]
-		fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Daily.Summary, icon)
-
+		now()
 	},
 }
 
