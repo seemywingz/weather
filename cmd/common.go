@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +10,7 @@ import (
 	"math"
 	"net/http"
 	"os"
-	"os/user"
+	"strings"
 	"time"
 )
 
@@ -207,7 +207,7 @@ func epochFormatHour(seconds int64) string {
 	return s
 }
 
-// LoE : log with error code 1 and print if err is notnull
+// LoE : if error, log to console
 func LoE(msg string, err error) {
 	if err != nil {
 		log.Printf("\n❌  %s\n   %v\n", msg, err)
@@ -223,36 +223,30 @@ func EoE(msg string, err error) {
 	}
 }
 
-// WriteVar : write gob to local folesystem
-func WriteVar(file string, data interface{}) error {
-	gobFile, err := os.Create(file)
-	if err != nil {
-		return err
+// Confirm : return confirmation based on user input
+func Confirm(q string) bool {
+	a := GetInput(q + " (Y/n) ")
+	var res bool
+	switch a {
+	case "":
+		fallthrough
+	case "y":
+		fallthrough
+	case "Y":
+		res = true
+	case "n":
+	case "N":
+		res = false
+	default:
+		return Confirm(q)
 	}
-	encoder := gob.NewEncoder(gobFile)
-	encoder.Encode(data)
-	gobFile.Close()
-	return nil
+	return res
 }
 
-// ReadVar : read gob from loacal filesystem
-func ReadVar(file string, object interface{}) error {
-	gobFile, err := os.Open(file)
-	if err != nil {
-		return err
-	}
-	decoder := gob.NewDecoder(gobFile)
-	err = decoder.Decode(object)
-	gobFile.Close()
-	return nil
-}
-
-// GetHomeDir : returns a full path to user's home dorectory
-func GetHomeDir() string {
-	usr, err := user.Current()
-	EoE("Failed to get Current User", err)
-	if usr.HomeDir != "" {
-		return usr.HomeDir
-	}
-	return os.Getenv("HOME")
+// GetInput : return string of user input
+func GetInput(q string) string {
+	print(q)
+	reader := bufio.NewReader(os.Stdin)
+	ans, _ := reader.ReadString('\n')
+	return strings.TrimRight(ans, "\n")
 }
