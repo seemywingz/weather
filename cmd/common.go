@@ -18,6 +18,14 @@ var verbose bool
 var location string
 var units string
 var unitFormat UnitMeasures
+var validUnits = map[string]string{
+	"auto": "Determin Units Based on Location",
+	"ca":   "same as si, except uses kilometers per hour",
+	"uk2":  "same as si, except miles, and miles per hour",
+	"us":   "Imperial units",
+	"si":   "International System of Units",
+}
+var unitDescription, _ = json.MarshalIndent(validUnits, "", "  ")
 
 func gatherData() (WeatherResponse, GeoLocationData) {
 

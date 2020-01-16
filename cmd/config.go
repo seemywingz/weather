@@ -50,9 +50,6 @@ var configCmd = &cobra.Command{
 	Long: `
 	
 	`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		return nil
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		configure()
 	},
