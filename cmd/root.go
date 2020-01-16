@@ -35,7 +35,7 @@ var rootCmd = &cobra.Command{
 	
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
-		if validUnits[units] == "" {
+		if validUnits[config.Units] == "" {
 			return fmt.Errorf("❌  Invalid Unit Type: %s", units)
 		}
 		return nil
@@ -59,8 +59,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "Location to Report Weather Conditions Of \nExamples: 12569, Beaverton, \"1600 Pennsylvania Ave\"\nIf empty, your location will be determined from you public IP address")
-	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "auto", "System of Units:"+string(unitDescription))
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
+	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "", "System of Units:"+string(unitDescription))
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output, print less common weather data")
 
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(todayCmd)

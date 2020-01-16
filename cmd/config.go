@@ -60,7 +60,6 @@ func configure() {
 }
 
 func initConfig() {
-
 	homeDir, err := homedir.Dir()
 	if err != nil {
 		LoE("Unable to Find Home Directory, Not Using Config File", err)
@@ -104,14 +103,19 @@ func confirmConfigDefaults() {
 
 func createConfig() {
 	os.MkdirAll(configDir, 0744)
+	if units == "" {
+		units = "auto"
+	}
+	config = Config{
+		units,
+		location,
+	}
+	jsonData, _ := json.MarshalIndent(config, "", "")
+	_ = ioutil.WriteFile(configFile, jsonData, 0644)
+
 	fmt.Println("")
 	fmt.Println("   Updating Weather Config:")
 	fmt.Println("      File:", configFile)
 	fmt.Println("     Units:", units)
 	fmt.Println("  Location:", location)
-	jsonData, _ := json.MarshalIndent(Config{
-		units,
-		location,
-	}, "", "")
-	_ = ioutil.WriteFile(configFile, jsonData, 0644)
 }

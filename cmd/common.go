@@ -21,7 +21,8 @@ var unitFormat UnitMeasures
 var validUnits = map[string]string{
 	"auto": "Determin Units Based on Location",
 	"ca":   "same as si, except uses kilometers per hour",
-	"uk2":  "same as si, except miles, and miles per hour",
+	"uk":   "same as si, except uses kilometers, and miles per hour",
+	"uk2":  "same as si, except uses miles, and miles per hour",
 	"us":   "Imperial units",
 	"si":   "International System of Units",
 }
