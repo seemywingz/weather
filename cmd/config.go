@@ -21,9 +21,21 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+)
+
+var (
+	configName,
+	configDir,
+	configFile string
+	config Config
 )
 
 // Config : User Defined Dfaults
@@ -42,10 +54,67 @@ var configCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		config()
+		configure()
 	},
 }
 
-func config() {
-	fmt.Println("CONFIG")
+func configure() {
+	confirmConfigDefaults()
+}
+
+func initConfig() {
+
+	homeDir, err := homedir.Dir()
+	if err != nil {
+		LoE("Unable to Find Home Directory, Not Using Config File", err)
+		return
+	}
+
+	configName = "config"
+	configDir = filepath.Join(homeDir, ".weather")
+	configFile = filepath.Join(configDir, configName)
+
+	if _, err := os.Stat(configFile); err == nil {
+		readConfig()
+		if location != "" {
+			config.Location = location
+		}
+		if units != "" {
+			config.Units = units
+		}
+	} else if os.IsNotExist(err) {
+		fmt.Println("It appears you don't have a config file")
+		confirmConfigDefaults()
+	} else {
+		LoE("Error Accessing Config Directory...", err)
+	}
+
+}
+
+func readConfig() {
+	file, _ := ioutil.ReadFile(configFile)
+	_ = json.Unmarshal([]byte(file), &config)
+}
+
+func confirmConfigDefaults() {
+	yes := Confirm("Want to use your current parameters?")
+	if yes {
+		createConfig()
+	} else {
+		fmt.Println("Skipping Config Creation")
+	}
+}
+
+func createConfig() {
+	os.MkdirAll(configDir, 0744)
+	fmt.Println("")
+	fmt.Println("   Updating Weather Config:")
+	fmt.Println("      File:", configFile)
+	fmt.Println("     Units:", units)
+	fmt.Println("  Location:", location)
+	jsonData, _ := json.MarshalIndent(Config{
+		units,
+		location,
+	}, "", "")
+	_ = ioutil.WriteFile(configFile, jsonData, 0644)
 }

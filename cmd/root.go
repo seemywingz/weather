@@ -27,12 +27,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	configName,
-	configDir,
-	configFile string
-)
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "weather",
@@ -60,15 +54,11 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output")
 	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "auto", "System of units (e.g. auto, us, si, ca, uk2)")
-	rootCmd.PersistentFlags().StringVarP(&locationArg, "location", "l", "", "Location to Report Weather Conditions Of (e.g 12569, Beaverton, \"1600 Pennsylvania Ave\")")
+	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "Location to Report Weather Conditions Of \nExamples: 12569, Beaverton, \"1600 Pennsylvania Ave\"\nIf empty, your location will be determined from you public IP address")
 
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(todayCmd)
 	rootCmd.AddCommand(dailyCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(hourlyCmd)
-}
-
-func initConfig() {
-
 }

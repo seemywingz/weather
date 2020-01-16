@@ -15,26 +15,26 @@ import (
 )
 
 var verbose bool
-var locationArg string
+var location string
 var units string
 var unitFormat UnitMeasures
 
 func gatherData() (WeatherResponse, GeoLocationData) {
 
-	var location GeoLocationData
+	var locationData GeoLocationData
 
-	if locationArg == "" {
-		location = getLocationDataFromIP()
+	if config.Location == "" {
+		locationData = getLocationDataFromIP()
 	} else {
-		location = geoLocate(locationArg)
+		locationData = geoLocate(location)
 	}
 
-	weather := getWeatherData(location.Latitude, location.Longitude)
+	weather := getWeatherData(locationData.Latitude, locationData.Longitude)
 	unitFormat = UnitFormats[weather.Flags.Units]
 
 	fmt.Println()
-	fmt.Printf("      Location: %v, %v, %v\n", location.City, location.RegionCode, location.CountryCode)
-	return weather, location
+	fmt.Printf("      Location: %v, %v, %v\n", locationData.City, locationData.RegionCode, locationData.CountryCode)
+	return weather, locationData
 }
 
 func display(weather WeatherData) {
@@ -100,7 +100,7 @@ func displayAlerts(alerts []WeatherAlert) {
 
 func getWeatherData(lat, long float32) WeatherResponse {
 
-	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, units)
+	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, config.Units)
 	res, err := http.Get(url)
 	EoE("Error Getting Location Data", err)
 
@@ -225,17 +225,19 @@ func EoE(msg string, err error) {
 
 // Confirm : return confirmation based on user input
 func Confirm(q string) bool {
-	a := GetInput(q + " (Y/n) ")
+	print(q + " (Y/n) ")
+	a := GetInput()
 	var res bool
-	switch a {
+	switch strings.ToLower(a) {
 	case "":
 		fallthrough
 	case "y":
 		fallthrough
-	case "Y":
+	case "yes":
 		res = true
 	case "n":
-	case "N":
+		fallthrough
+	case "no":
 		res = false
 	default:
 		return Confirm(q)
@@ -244,8 +246,7 @@ func Confirm(q string) bool {
 }
 
 // GetInput : return string of user input
-func GetInput(q string) string {
-	print(q)
+func GetInput() string {
 	reader := bufio.NewReader(os.Stdin)
 	ans, _ := reader.ReadString('\n')
 	return strings.TrimRight(ans, "\n")
