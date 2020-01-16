@@ -21,14 +21,10 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -66,11 +62,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "auto", "System of units (e.g. auto, us, si, ca, uk2)")
 	rootCmd.PersistentFlags().StringVarP(&locationArg, "location", "l", "", "Location to Report Weather Conditions Of (e.g 12569, Beaverton, \"1600 Pennsylvania Ave\")")
 
-	viper.BindPFlag("units", rootCmd.PersistentFlags().Lookup("units"))
-	viper.BindPFlag("location", rootCmd.PersistentFlags().Lookup("location"))
-	viper.SetDefault("units", "auto")
-	viper.SetDefault("location", "")
-
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(todayCmd)
 	rootCmd.AddCommand(dailyCmd)
@@ -79,31 +70,5 @@ func init() {
 }
 
 func initConfig() {
-
-	// Find home directory.
-	homeDir, err := homedir.Dir()
-	if err != nil {
-		LoE("Error Getting Home Directory", err)
-		return
-	}
-
-	configName = "config"
-	configDir = homeDir + "/.weather"
-	configFile = configDir + "/" + configName
-	viper.SetConfigType("json")
-	viper.SetConfigFile(configFile)
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		LoE("", err)
-		if os.IsNotExist(err) {
-			if _, err := os.Stat(configDir); os.IsNotExist(err) { // config dir not found
-				os.MkdirAll(configDir, 0777) // create config dir
-				config, _ := json.MarshalIndent(Config{}, "", "")
-				err = ioutil.WriteFile(configFile, config, 0644)
-			}
-		}
-	}
 
 }

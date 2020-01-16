@@ -39,9 +39,6 @@ var configCmd = &cobra.Command{
 	
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
-		// if len(args) < 1 {
-		// 	return errors.New("Must provide one argument")
-		// }
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
