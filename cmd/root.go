@@ -59,7 +59,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "Location to Report Weather Conditions Of \nExamples: 12569, Beaverton, \"1600 Pennsylvania Ave\"\nIf empty, your location will be determined from you public IP address")
-	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "", "System of Units:"+string(unitDescription))
+	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "", "System of Units:\n"+unitDescription)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output, print less common weather data")
 
 	rootCmd.AddCommand(nowCmd)

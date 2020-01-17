@@ -26,7 +26,7 @@ var validUnits = map[string]string{
 	"us":   "Imperial units",
 	"si":   "International System of Units",
 }
-var unitDescription, _ = json.MarshalIndent(validUnits, "", "  ")
+var unitDescription = mapToString(validUnits)
 
 func gatherData() (WeatherResponse, GeoLocationData) {
 
@@ -259,4 +259,12 @@ func GetInput() string {
 	reader := bufio.NewReader(os.Stdin)
 	ans, _ := reader.ReadString('\n')
 	return strings.TrimRight(ans, "\n")
+}
+
+func mapToString(m map[string]string) string {
+	b := new(bytes.Buffer)
+	for key, value := range m {
+		fmt.Fprintf(b, "  %s: %s\n", key, value)
+	}
+	return b.String()
 }
