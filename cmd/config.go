@@ -93,12 +93,15 @@ func readConfig() {
 }
 
 func confirmConfigDefaults() {
-	yes := Confirm("Want to use your current parameters?")
-	if yes {
-		createConfig()
+	if Confirm("Want to use your current parameters?") {
+	} else if Confirm("Want to use Defaults:\n  Units = `auto`\n") {
+		units = "auto"
+		location = ""
 	} else {
-		fmt.Println("Skipping Config Creation")
+		fmt.Println("Okay, Select Units:")
+		units = SelectFromMap(validUnits)
 	}
+	createConfig()
 }
 
 func createConfig() {
