@@ -279,12 +279,13 @@ func SelectFromArray(a []string) string {
 
 // SelectFromMap : select an element in the provided map
 func SelectFromMap(m map[string]string) string {
+	fmt.Println("")
 	fmt.Println(mapToString(m))
 	sel := GetInput()
 	if _, found := m[sel]; found {
 		return sel
 	}
-	fmt.Printf("%v is an Invalid Selection", sel)
+	fmt.Printf("%v is an Invalid Selection\n", sel)
 	return SelectFromMap(m)
 }
 
