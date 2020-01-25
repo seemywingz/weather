@@ -15,10 +15,16 @@ import (
 	"time"
 )
 
+// Flag Vars
 var verbose bool
 var location string
 var units string
+
+// Format
 var unitFormat UnitMeasures
+var unitDescription = mapToString(validUnits)
+
+// Validation
 var validUnits = map[string]string{
 	"auto": "Determin Units Based on Location",
 	"ca":   "same as si, except uses kilometers per hour",
@@ -33,8 +39,6 @@ var validArgs = map[string]string{
 	"hourly": "",
 	"now":    "",
 }
-
-var unitDescription = mapToString(validUnits)
 
 func gatherData() (WeatherResponse, GeoLocationData) {
 
