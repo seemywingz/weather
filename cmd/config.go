@@ -40,6 +40,8 @@ var (
 	config Config
 )
 
+var auto bool
+
 // Config : User Defined Dfaults
 type Config struct {
 	Units    string `json:"units"`
@@ -56,6 +58,11 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		configure()
 	},
+}
+
+func init() {
+
+	configCmd.Flags().BoolVarP(&auto, "auto", "a", false, "set all config values to auto")
 }
 
 func initConfig() {
@@ -90,13 +97,15 @@ func readConfig() {
 func configOverride() {
 	if location != "" {
 		config.Location = location
-	} else {
-		config.Location = "auto"
 	}
 	if units != "" {
 		config.Units = units
-	} else {
+	}
+	if config.Units == "" {
 		config.Units = "auto"
+	}
+	if config.Location == "" {
+		config.Location = "auto"
 	}
 }
 
@@ -111,15 +120,6 @@ func printCurrentConfig() {
 	// }
 }
 
-func confirmSave() {
-	printCurrentConfig()
-	if gtb.Confirm("\nWant to save these parameters?") {
-		getAPIKey()
-		saveConfig()
-		os.Exit(0)
-	}
-}
-
 func saveConfig() {
 	fmt.Println("\nSaving Config As:", configFile)
 	os.MkdirAll(configDir, 0744)
@@ -128,8 +128,7 @@ func saveConfig() {
 	printCurrentConfig()
 }
 
-func getAPIKey() {
-
+func configAPIKey() {
 	if config.APIKey == "" {
 		fmt.Println("Enter Your Dark Sky API Key")
 		fmt.Println("Don't Have One?")
@@ -138,20 +137,29 @@ func getAPIKey() {
 		config.APIKey = gtb.GetInput()
 	} else if gtb.Confirm("Want to Replace Your Dark Sky API Key?") {
 		config.APIKey = ""
-		getAPIKey()
+		configAPIKey()
 	}
+}
 
+func confirmSave() {
+	printCurrentConfig()
+	if gtb.Confirm("\nWant to save these parameters?") {
+		configAPIKey()
+		saveConfig()
+		os.Exit(0)
+	}
 }
 
 func configure() {
 
-	if config.Location != "auto" || config.Units != "auto" {
-		confirmSave()
-	}
+	// if auto {
+	// 	config.Location = "auto"
+	// 	config.Units = "auto"
+	// 	configAPIKey()
+	// 	return
+	// }
 
-	fmt.Println("\nLet's try some defaults...")
-	config.Units = "auto"
-	config.Location = "auto"
+	fmt.Println("\nCurrent Parameters:")
 	confirmSave()
 
 	fmt.Println("\nOkay, let's make some choices:")
@@ -162,6 +170,6 @@ func configure() {
 	fmt.Printf(":")
 	config.Location = gtb.GetInput()
 	fmt.Println("\nOkay, Great!")
-	getAPIKey()
+	configAPIKey()
 	confirmSave()
 }
