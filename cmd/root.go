@@ -34,15 +34,23 @@ var rootCmd = &cobra.Command{
 	Long: `
 	
 	`,
+	ValidArgs: []string{"today"},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if validUnits[config.Units] == "" {
 			return fmt.Errorf("❌  Invalid Unit Type: %s", units)
 		}
+
+		for _, arg := range args {
+			if _, ok := validArgs[arg]; !ok {
+				return fmt.Errorf("❌  Invalid Arg: %s", arg)
+			}
+		}
+
 		return nil
 	},
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	now()
-	// },
+	Run: func(cmd *cobra.Command, args []string) {
+		now()
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

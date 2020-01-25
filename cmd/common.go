@@ -27,6 +27,13 @@ var validUnits = map[string]string{
 	"us":   "Imperial units",
 	"si":   "International System of Units",
 }
+var validArgs = map[string]string{
+	"daily":  "",
+	"today":  "",
+	"hourly": "",
+	"now":    "",
+}
+
 var unitDescription = mapToString(validUnits)
 
 func gatherData() (WeatherResponse, GeoLocationData) {
