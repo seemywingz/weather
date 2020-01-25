@@ -21,7 +21,10 @@ type GeoLocationData struct {
 	IP          string  `json:"ip"`
 }
 
-func geoLocateFromIP() GeoLocationData {
+// both of the folloing APIs are not provided by me 😅
+
+// GeoLocateFromIP : get location data based on IP
+func GeoLocateFromIP() GeoLocationData {
 
 	url := "https://telize.j3ss.co/geoip"
 	res, err := http.Get(url)
@@ -37,7 +40,8 @@ func geoLocateFromIP() GeoLocationData {
 
 }
 
-func geoLocate(location string) GeoLocationData {
+// GeoLocate : Use Google Location Servicies to get location data from search string
+func GeoLocate(location string) GeoLocationData {
 
 	url := "https://geocode.jessfraz.com/geocode"
 
