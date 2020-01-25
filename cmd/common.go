@@ -45,7 +45,7 @@ func gatherData() (WeatherResponse, GeoLocationData) {
 	var locationData GeoLocationData
 
 	if config.Location == "" {
-		locationData = getLocationDataFromIP()
+		locationData = geoLocateFromIP()
 	} else {
 		locationData = geoLocate(location)
 	}
@@ -121,7 +121,7 @@ func displayAlerts(alerts []WeatherAlert) {
 
 func getWeatherData(lat, long float32) WeatherResponse {
 
-	url := fmt.Sprintf("https://api.darksky.net/forecast/b0e78d287f75fb03eba6022344d3b944/%v,%v?units=%v", lat, long, config.Units)
+	url := fmt.Sprintf("https://api.darksky.net/forecast/%v/%v,%v?units=%v", darkSkyAPIKey, lat, long, config.Units)
 	res, err := http.Get(url)
 	EoE("Error Getting Location Data", err)
 
@@ -163,44 +163,6 @@ func getMoonPhase(phase float64) string {
 	}
 
 	return icon
-}
-
-func getLocationDataFromIP() GeoLocationData {
-
-	url := "https://telize.j3ss.co/geoip"
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	responseData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	locationData := GeoLocationData{}
-	json.Unmarshal(responseData, &locationData)
-
-	return locationData
-
-}
-
-func geoLocate(location string) GeoLocationData {
-
-	url := "https://geocode.jessfraz.com/geocode"
-
-	reqBody, _ := json.Marshal(map[string]string{
-		"Location": location,
-	})
-
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(reqBody))
-	EoE("Error Getting GeoLocation Response", err)
-
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-
-	locationData := GeoLocationData{}
-	json.Unmarshal(body, &locationData)
-
-	return locationData
-
 }
 
 func epochFormat(seconds int64) string {
