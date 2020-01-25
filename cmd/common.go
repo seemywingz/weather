@@ -1,12 +1,7 @@
 package cmd
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/seemywingz/gotoolbox/epoch"
@@ -21,7 +16,7 @@ var units string
 
 // Format
 var unitFormat darksky.UnitMeasures
-var unitDescription = mapToString(darksky.ValidUnits)
+var unitDescription = gtb.MapToString(darksky.ValidUnits)
 
 var validArgs = map[string]string{
 	"daily":  "",
@@ -108,68 +103,4 @@ func displayAlerts(alerts []darksky.Alert) {
 	for _, alert := range alerts {
 		fmt.Printf("\n      ⚠️  %v ⚠️\n %v\n", alert.Title, alert.Description)
 	}
-}
-
-// Confirm : return confirmation based on user input
-func Confirm(q string) bool {
-	print(q + " (Y/n) ")
-	a := GetInput()
-	var res bool
-	switch strings.ToLower(a) {
-	case "":
-		fallthrough
-	case "y":
-		fallthrough
-	case "yes":
-		res = true
-	case "n":
-		fallthrough
-	case "no":
-		res = false
-	default:
-		return Confirm(q)
-	}
-	return res
-}
-
-// GetInput : return string of user input
-func GetInput() string {
-	reader := bufio.NewReader(os.Stdin)
-	ans, _ := reader.ReadString('\n')
-	return strings.TrimRight(ans, "\n")
-}
-
-// SelectFromArray : select an element in the provided array
-func SelectFromArray(a []string) string {
-	fmt.Println("Choices:")
-	for i := range a {
-		fmt.Println("[", i, "]: "+a[i])
-	}
-	fmt.Println("Enter Number of Selection: ")
-	sel, err := strconv.Atoi(GetInput())
-	gtb.EoE("Error Getting Integer Input from User", err)
-	if sel <= len(a)-1 {
-		return a[sel]
-	}
-	return SelectFromArray(a)
-}
-
-// SelectFromMap : select an element in the provided map
-func SelectFromMap(m map[string]string) string {
-	fmt.Println("")
-	fmt.Println(mapToString(m))
-	sel := GetInput()
-	if _, found := m[sel]; found {
-		return sel
-	}
-	fmt.Printf("%v is an Invalid Selection\n", sel)
-	return SelectFromMap(m)
-}
-
-func mapToString(m map[string]string) string {
-	b := new(bytes.Buffer)
-	for key, value := range m {
-		fmt.Fprintf(b, "  %s: %s\n", key, value)
-	}
-	return b.String()
 }

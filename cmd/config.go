@@ -95,13 +95,13 @@ func readConfig() {
 }
 
 func confirmConfigDefaults() {
-	if Confirm("Want to use your current parameters?") {
-	} else if Confirm("Want to use Defaults:\n  Units = `auto`\n") {
+	if gtb.Confirm("Want to use your current parameters?") {
+	} else if gtb.Confirm("Want to use Defaults:\n  Units = `auto`\n") {
 		units = "auto"
 		location = ""
 	} else {
 		fmt.Println("Okay, Select Units:")
-		units = SelectFromMap(darksky.ValidUnits)
+		units = gtb.SelectFromMap(darksky.ValidUnits)
 	}
 	createConfig()
 }
