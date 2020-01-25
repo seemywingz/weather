@@ -1,6 +1,24 @@
 # weather
 Golang CLI for getting Weather Information provided by DarkSky API
 
+## Requirements
+* Dark Sky API Key
+  * Get one for free at: https://darksky.net/dev
+* Go  
+  * Official Docs: https://golang.org/doc/install
+  * Easy Steps for Mac https://github.com/golang/go/wiki/Darwin
+    ```
+    brew update
+    brew install golang
+    ``` 
+  * Easy Steps for Ubuntu: https://github.com/golang/go/wiki/Ubuntu
+    ```
+    sudo add-apt-repository ppa:longsleep/golang-backports
+    sudo apt-get update
+    sudo apt-get install golang-go
+    ```
+   * Windows: https://github.com/golang/go/wiki/Windows
+
 ## Installation
 ```shell
 go install github.com/seemywingz/weather
