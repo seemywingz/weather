@@ -29,13 +29,13 @@ func gatherData() (darksky.Data, geolocation.Data) {
 
 	var locationData geolocation.Data
 
-	if config.Location == "" {
+	if config.Location == "" || config.Location == "auto" {
 		locationData, _ = geolocation.FromIP()
 	} else {
 		locationData, _ = geolocation.Locate(location)
 	}
 
-	weather, err := darksky.GetData(locationData.Latitude, locationData.Longitude, darkSkyAPIKey, config.Units)
+	weather, err := darksky.GetData(locationData.Latitude, locationData.Longitude, config.APIKey, config.Units)
 	gtb.EoE("Error Getting DarkSky Data", err)
 	unitFormat = darksky.UnitFormats[weather.Flags.Units]
 

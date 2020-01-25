@@ -1,6 +1,11 @@
 # weather
 Golang CLI for getting Weather Information provided by DarkSky API
 
+## Installation
+```shell
+go install github.com/seemywingz/weather
+```
+
 ## Usage
 ```shell
 ▶ weather --help

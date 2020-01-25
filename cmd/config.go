@@ -44,6 +44,7 @@ var (
 type Config struct {
 	Units    string `json:"units"`
 	Location string `json:"location"`
+	APIKey   string `json:"apiKey"`
 }
 
 var configCmd = &cobra.Command{
@@ -55,10 +56,6 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		configure()
 	},
-}
-
-func configure() {
-	confirmConfigDefaults()
 }
 
 func initConfig() {
@@ -74,15 +71,11 @@ func initConfig() {
 
 	if _, err := os.Stat(configFile); err == nil {
 		readConfig()
-		if location != "" {
-			config.Location = location
-		}
-		if units != "" {
-			config.Units = units
-		}
+		configOverride()
 	} else if os.IsNotExist(err) {
-		fmt.Println("It appears you don't have a config file")
-		confirmConfigDefaults()
+		fmt.Println("It appears you don't have a saved config file")
+		configOverride()
+		configure()
 	} else {
 		gtb.LoE("Error Accessing Config Directory...", err)
 	}
@@ -94,33 +87,81 @@ func readConfig() {
 	_ = json.Unmarshal([]byte(file), &config)
 }
 
-func confirmConfigDefaults() {
-	if gtb.Confirm("Want to use your current parameters?") {
-	} else if gtb.Confirm("Want to use Defaults:\n  Units = `auto`\n") {
-		units = "auto"
-		location = ""
+func configOverride() {
+	if location != "" {
+		config.Location = location
 	} else {
-		fmt.Println("Okay, Select Units:")
-		units = gtb.SelectFromMap(darksky.ValidUnits)
+		config.Location = "auto"
 	}
-	createConfig()
+	if units != "" {
+		config.Units = units
+	} else {
+		config.Units = "auto"
+	}
 }
 
-func createConfig() {
+func printCurrentConfig() {
+	fmt.Println("")
+	// fmt.Println("   Weather Config:")
+	// fmt.Println("      File:", configFile)
+	fmt.Println("     Units:", config.Units)
+	fmt.Println("  Location:", config.Location)
+	// if config.APIKey != "" {
+	// 	fmt.Println("   API Key:", config.APIKey)
+	// }
+}
+
+func confirmSave() {
+	printCurrentConfig()
+	if gtb.Confirm("\nWant to save these parameters?") {
+		getAPIKey()
+		saveConfig()
+		os.Exit(0)
+	}
+}
+
+func saveConfig() {
+	fmt.Println("\nSaving Config As:", configFile)
 	os.MkdirAll(configDir, 0744)
-	if units == "" {
-		units = "auto"
-	}
-	config = Config{
-		units,
-		location,
-	}
 	jsonData, _ := json.MarshalIndent(config, "", "")
 	_ = ioutil.WriteFile(configFile, jsonData, 0644)
+	printCurrentConfig()
+}
 
-	fmt.Println("")
-	fmt.Println("   Updating Weather Config:")
-	fmt.Println("      File:", configFile)
-	fmt.Println("     Units:", units)
-	fmt.Println("  Location:", location)
+func getAPIKey() {
+
+	if config.APIKey == "" {
+		fmt.Println("Enter Your Dark Sky API Key")
+		fmt.Println("Don't Have One?")
+		fmt.Println("Get One for Free At: https://darksky.net/dev")
+		fmt.Printf(":")
+		config.APIKey = gtb.GetInput()
+	} else if gtb.Confirm("Want to Replace Your Dark Sky API Key?") {
+		config.APIKey = ""
+		getAPIKey()
+	}
+
+}
+
+func configure() {
+
+	if config.Location != "auto" || config.Units != "auto" {
+		confirmSave()
+	}
+
+	fmt.Println("\nLet's try some defaults...")
+	config.Units = "auto"
+	config.Location = "auto"
+	confirmSave()
+
+	fmt.Println("\nOkay, let's make some choices:")
+	config.Units = gtb.SelectFromMap(darksky.ValidUnits)
+	fmt.Println("\nEnter Your Default Location")
+	fmt.Println("Examples:\n  12569, Beaverton, \"1600 Pennsylvania Ave\"")
+	fmt.Println("  enter \"auto\" and your location will be determined from you public IP address!")
+	fmt.Printf(":")
+	config.Location = gtb.GetInput()
+	fmt.Println("\nOkay, Great!")
+	getAPIKey()
+	confirmSave()
 }
