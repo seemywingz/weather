@@ -3,16 +3,16 @@ package cmd
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/seemywingz/gotoolbox/darksky"
+	"github.com/seemywingz/gotoolbox/epoch"
+	"github.com/seemywingz/gotoolbox/geolocation"
 )
 
 // Flag Vars
@@ -40,17 +40,18 @@ var validArgs = map[string]string{
 	"now":    "",
 }
 
-func gatherData() (WeatherResponse, GeoLocationData) {
+func gatherData() (darksky.Data, geolocation.Data) {
 
-	var locationData GeoLocationData
+	var locationData geolocation.Data
 
 	if config.Location == "" {
-		locationData = GeoLocateFromIP()
+		locationData, _ = geolocation.FromIP()
 	} else {
-		locationData = GeoLocate(location)
+		locationData, _ = geolocation.Locate(location)
 	}
 
-	weather := getWeatherData(locationData.Latitude, locationData.Longitude)
+	weather, err := darksky.GetData(locationData.Latitude, locationData.Longitude, darkSkyAPIKey, config.Units)
+	EoE("Error Getting DarkSky Data", err)
 	unitFormat = UnitFormats[weather.Flags.Units]
 
 	fmt.Println()
@@ -58,10 +59,10 @@ func gatherData() (WeatherResponse, GeoLocationData) {
 	return weather, locationData
 }
 
-func display(weather WeatherData) {
+func displayCurrent(weather darksky.CurrentData) {
 	icon := Icons[weather.Icon]
 
-	fmt.Printf("          Time: %v\n", epochFormat(weather.Time))
+	fmt.Printf("          Time: %v\n", epoch.Format(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
 	fmt.Printf("          Temp: %v%v\n", weather.Temperature, unitFormat.Degrees)
 	fmt.Printf("    Feels Like: %v%v\n", weather.ApparentTemperature, unitFormat.Degrees)
@@ -85,14 +86,14 @@ func display(weather WeatherData) {
 	}
 }
 
-func displayDaily(weather DailyWeatherData) {
+func displayDaily(weather darksky.DailyData) {
 	icon := Icons[weather.Icon]
 
-	fmt.Printf("          Date: %v\n", epochFormatDate(weather.Time))
+	fmt.Printf("          Date: %v\n", epoch.FormatDate(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
-	fmt.Printf("       Sunrise: %v\n", epochFormatTime(weather.SunriseTime))
-	fmt.Printf("        Sunset: %v\n", epochFormatTime(weather.SunsetTime))
-	fmt.Printf("    Moon Phase: %v\n", getMoonPhase(weather.MoonPhase))
+	fmt.Printf("       Sunrise: %v\n", epoch.FormatTime(weather.SunriseTime))
+	fmt.Printf("        Sunset: %v\n", epoch.FormatTime(weather.SunsetTime))
+	fmt.Printf("    Moon Phase: %v\n", darksky.MoonPhaseIcon(weather.MoonPhase))
 	fmt.Printf("          High: %v%v\n", weather.TemperatureHigh, unitFormat.Degrees)
 	fmt.Printf("           Low: %v%v\n", weather.TemperatureLow, unitFormat.Degrees)
 	if weather.PrecipProbability*100 > 1 {
@@ -113,81 +114,15 @@ func displayDaily(weather DailyWeatherData) {
 
 }
 
-func displayAlerts(alerts []WeatherAlert) {
+func displayAlerts(alerts []darksky.Alert) {
 	for _, alert := range alerts {
 		fmt.Printf("\n      ⚠️  %v ⚠️\n %v\n", alert.Title, alert.Description)
 	}
 }
 
-func getWeatherData(lat, long float32) WeatherResponse {
-
-	url := fmt.Sprintf("https://api.darksky.net/forecast/%v/%v,%v?units=%v", darkSkyAPIKey, lat, long, config.Units)
-	res, err := http.Get(url)
-	EoE("Error Getting Location Data", err)
-
-	resData, err := ioutil.ReadAll(res.Body)
-	EoE("Error Reading Location Data", err)
-
-	weatherResponse := WeatherResponse{}
-	json.Unmarshal(resData, &weatherResponse)
-
-	return weatherResponse
-
-}
-
 func getBearings(degrees float64) string {
 	index := int(math.Mod((degrees+11.25)/22.5, 16))
 	return Directions[index]
-}
-
-func getMoonPhase(phase float64) string {
-	var icon string
-
-	switch {
-	case phase == 0:
-		icon = "🌑"
-	case phase > 0 && phase < 0.25:
-		icon = "🌒"
-	case phase == 0.25:
-		icon = "🌓"
-	case phase > 0.25 && phase < 0.5:
-		icon = "🌔"
-	case phase == 0.5:
-		icon = "🌕"
-	case phase >= 0.5 && phase < 0.75:
-		icon = "🌖"
-	case phase == 0.75:
-		icon = "🌗"
-	case phase > 0.75:
-		icon = "🌘"
-	}
-
-	return icon
-}
-
-func epochFormat(seconds int64) string {
-	epochTime := time.Unix(0, seconds*int64(time.Second))
-	return epochTime.Format("January 2, 3:04pm MST")
-}
-
-func epochFormatDate(seconds int64) string {
-	epochTime := time.Unix(0, seconds*int64(time.Second))
-	return epochTime.Format("January 2 (Monday)")
-}
-
-func epochFormatTime(seconds int64) string {
-	epochTime := time.Unix(0, seconds*int64(time.Second))
-	return epochTime.Format("3:04pm MST")
-}
-
-func epochFormatHour(seconds int64) string {
-	epochTime := time.Unix(0, seconds*int64(time.Second))
-	s := epochTime.Format("3pm")
-	s = s[:len(s)-1]
-	if len(s) == 2 {
-		s += " "
-	}
-	return s
 }
 
 // LoE : if error, log to console

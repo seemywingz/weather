@@ -43,6 +43,6 @@ var nowCmd = &cobra.Command{
 
 func now() {
 	weather, _ := gatherData()
-	display(weather.Currently)
+	displayCurrent(weather.Currently)
 	displayAlerts(weather.Alerts)
 }

@@ -60,7 +60,7 @@ func hourly() {
 	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Hourly.Summary, icon)
 
 	for i := 0; i < numHours; i++ {
-		display(weather.Hourly.Data[i])
+		displayCurrent(weather.Hourly.Data[i])
 		fmt.Println()
 	}
 	displayAlerts(weather.Alerts)
