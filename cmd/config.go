@@ -28,6 +28,8 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/seemywingz/gotoolbox/darksky"
+	"github.com/seemywingz/gotoolbox/gtb"
 	"github.com/spf13/cobra"
 )
 
@@ -62,7 +64,7 @@ func configure() {
 func initConfig() {
 	homeDir, err := homedir.Dir()
 	if err != nil {
-		LoE("Unable to Find Home Directory, Not Using Config File", err)
+		gtb.LoE("Unable to Find Home Directory, Not Using Config File", err)
 		return
 	}
 
@@ -82,7 +84,7 @@ func initConfig() {
 		fmt.Println("It appears you don't have a config file")
 		confirmConfigDefaults()
 	} else {
-		LoE("Error Accessing Config Directory...", err)
+		gtb.LoE("Error Accessing Config Directory...", err)
 	}
 
 }
@@ -99,7 +101,7 @@ func confirmConfigDefaults() {
 		location = ""
 	} else {
 		fmt.Println("Okay, Select Units:")
-		units = SelectFromMap(validUnits)
+		units = SelectFromMap(darksky.ValidUnits)
 	}
 	createConfig()
 }

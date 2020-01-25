@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/seemywingz/gotoolbox/epoch"
 	"github.com/seemywingz/gotoolbox/geolocation"
+	"github.com/seemywingz/gotoolbox/gtb"
 )
 
 // Flag Vars
@@ -21,17 +21,8 @@ var units string
 
 // Format
 var unitFormat darksky.UnitMeasures
-var unitDescription = mapToString(validUnits)
+var unitDescription = mapToString(darksky.ValidUnits)
 
-// Validation
-var validUnits = map[string]string{
-	"auto": "Determin Units Based on Location",
-	"ca":   "same as si, except uses kilometers per hour",
-	"uk":   "same as si, except uses kilometers, and miles per hour",
-	"uk2":  "same as si, except uses miles, and miles per hour",
-	"us":   "Imperial units",
-	"si":   "International System of Units",
-}
 var validArgs = map[string]string{
 	"daily":  "",
 	"today":  "",
@@ -50,7 +41,7 @@ func gatherData() (darksky.Data, geolocation.Data) {
 	}
 
 	weather, err := darksky.GetData(locationData.Latitude, locationData.Longitude, darkSkyAPIKey, config.Units)
-	EoE("Error Getting DarkSky Data", err)
+	gtb.EoE("Error Getting DarkSky Data", err)
 	unitFormat = darksky.UnitFormats[weather.Flags.Units]
 
 	fmt.Println()
@@ -119,22 +110,6 @@ func displayAlerts(alerts []darksky.Alert) {
 	}
 }
 
-// LoE : if error, log to console
-func LoE(msg string, err error) {
-	if err != nil {
-		log.Printf("\n❌  %s\n   %v\n", msg, err)
-	}
-}
-
-// EoE : exit with error code 1 and print, if err is not nil
-func EoE(msg string, err error) {
-	if err != nil {
-		fmt.Printf("\n❌  %s\n   %v\n", msg, err)
-		os.Exit(1)
-		panic(err)
-	}
-}
-
 // Confirm : return confirmation based on user input
 func Confirm(q string) bool {
 	print(q + " (Y/n) ")
@@ -172,7 +147,7 @@ func SelectFromArray(a []string) string {
 	}
 	fmt.Println("Enter Number of Selection: ")
 	sel, err := strconv.Atoi(GetInput())
-	EoE("Error Getting Integer Input from User", err)
+	gtb.EoE("Error Getting Integer Input from User", err)
 	if sel <= len(a)-1 {
 		return a[sel]
 	}

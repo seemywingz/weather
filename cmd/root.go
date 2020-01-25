@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +37,7 @@ var rootCmd = &cobra.Command{
 	`,
 	ValidArgs: []string{"today"},
 	Args: func(cmd *cobra.Command, args []string) error {
-		if validUnits[config.Units] == "" {
+		if darksky.ValidUnits[config.Units] == "" {
 			return fmt.Errorf("❌  Invalid Unit Type: %s", units)
 		}
 
