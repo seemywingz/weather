@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -21,7 +20,7 @@ var location string
 var units string
 
 // Format
-var unitFormat UnitMeasures
+var unitFormat darksky.UnitMeasures
 var unitDescription = mapToString(validUnits)
 
 // Validation
@@ -52,7 +51,7 @@ func gatherData() (darksky.Data, geolocation.Data) {
 
 	weather, err := darksky.GetData(locationData.Latitude, locationData.Longitude, darkSkyAPIKey, config.Units)
 	EoE("Error Getting DarkSky Data", err)
-	unitFormat = UnitFormats[weather.Flags.Units]
+	unitFormat = darksky.UnitFormats[weather.Flags.Units]
 
 	fmt.Println()
 	fmt.Printf("      Location: %v, %v, %v\n", locationData.City, locationData.RegionCode, locationData.CountryCode)
@@ -60,7 +59,7 @@ func gatherData() (darksky.Data, geolocation.Data) {
 }
 
 func displayCurrent(weather darksky.CurrentData) {
-	icon := Icons[weather.Icon]
+	icon := darksky.Icons[weather.Icon]
 
 	fmt.Printf("          Time: %v\n", epoch.Format(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
@@ -72,9 +71,9 @@ func displayCurrent(weather darksky.CurrentData) {
 	}
 	fmt.Printf("      Humidity: %.2f%%\n", weather.Humidity*100)
 	fmt.Printf("   Cloud Cover: %.2f%%\n", weather.CloudCover*100)
-	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
+	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, darksky.GetBearings(weather.WindBearing))
 	if weather.NearestStormDistance > 0 {
-		fmt.Printf(" Nearest Storm: %v %v %v\n", weather.NearestStormDistance, unitFormat.Length, getBearings(weather.NearestStormBearing))
+		fmt.Printf(" Nearest Storm: %v %v %v\n", weather.NearestStormDistance, unitFormat.Length, darksky.GetBearings(weather.NearestStormBearing))
 	}
 	if verbose {
 		fmt.Printf("     Wind Gust: %v %v\n", weather.WindGust, unitFormat.Speed)
@@ -87,7 +86,7 @@ func displayCurrent(weather darksky.CurrentData) {
 }
 
 func displayDaily(weather darksky.DailyData) {
-	icon := Icons[weather.Icon]
+	icon := darksky.Icons[weather.Icon]
 
 	fmt.Printf("          Date: %v\n", epoch.FormatDate(weather.Time))
 	fmt.Printf("       Weather: %v  %v %v\n", icon, weather.Summary, icon)
@@ -102,7 +101,7 @@ func displayDaily(weather darksky.DailyData) {
 	}
 	fmt.Printf("      Humidity: %.2f%%\n", weather.Humidity*100)
 	fmt.Printf("   Cloud Cover: %.2f%%\n", weather.CloudCover*100)
-	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, getBearings(weather.WindBearing))
+	fmt.Printf("    Wind Speed: %v %v %v\n", weather.WindSpeed, unitFormat.Speed, darksky.GetBearings(weather.WindBearing))
 	if verbose {
 		fmt.Printf("     Wind Gust: %v %v\n", weather.WindGust, unitFormat.Speed)
 		fmt.Printf("     Dew Point: %v%v\n", weather.DewPoint, unitFormat.Degrees)
@@ -118,11 +117,6 @@ func displayAlerts(alerts []darksky.Alert) {
 	for _, alert := range alerts {
 		fmt.Printf("\n      ⚠️  %v ⚠️\n %v\n", alert.Title, alert.Description)
 	}
-}
-
-func getBearings(degrees float64) string {
-	index := int(math.Mod((degrees+11.25)/22.5, 16))
-	return Directions[index]
 }
 
 // LoE : if error, log to console

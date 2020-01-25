@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/spf13/cobra"
 )
 
@@ -46,7 +47,7 @@ var dailyCmd = &cobra.Command{
 func daily() {
 
 	weather, _ := gatherData()
-	icon := Icons[weather.Daily.Icon]
+	icon := darksky.Icons[weather.Daily.Icon]
 	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Daily.Summary, icon)
 
 	for _, data := range weather.Daily.Data {

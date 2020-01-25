@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/spf13/cobra"
 )
 
@@ -56,7 +57,7 @@ func hourly() {
 	}
 
 	weather, _ := gatherData()
-	icon := Icons[weather.Hourly.Icon]
+	icon := darksky.Icons[weather.Hourly.Icon]
 	fmt.Printf("       Weather: %v  %v %v\n\n", icon, weather.Hourly.Summary, icon)
 
 	for i := 0; i < numHours; i++ {
