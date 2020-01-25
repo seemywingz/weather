@@ -45,9 +45,9 @@ func gatherData() (WeatherResponse, GeoLocationData) {
 	var locationData GeoLocationData
 
 	if config.Location == "" {
-		locationData = geoLocateFromIP()
+		locationData = GeoLocateFromIP()
 	} else {
-		locationData = geoLocate(location)
+		locationData = GeoLocate(location)
 	}
 
 	weather := getWeatherData(locationData.Latitude, locationData.Longitude)
