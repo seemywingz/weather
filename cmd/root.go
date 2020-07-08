@@ -26,6 +26,7 @@ import (
 
 	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -67,9 +68,13 @@ func init() {
 
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "Location to Report Weather Conditions Of \nExamples: 12569, Beaverton, \"1600 Pennsylvania Ave\"\nIf empty, your location will be determined from you public IP address")
-	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "", "System of Units:\n"+unitDescription)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose Output, print less common weather data")
+
+	rootCmd.PersistentFlags().StringVarP(&location, "location", "l", "", "Location to Report Weather Conditions Of \nExamples: 12569, Beaverton, \"1600 Pennsylvania Ave\"\nIf empty, your location will be determined from you public IP address")
+	viper.BindPFlag("location", rootCmd.PersistentFlags().Lookup("location"))
+
+	rootCmd.PersistentFlags().StringVarP(&units, "units", "u", "", "System of Units:\n"+unitDescription)
+	viper.BindPFlag("units", rootCmd.PersistentFlags().Lookup("units"))
 
 	rootCmd.AddCommand(nowCmd)
 	rootCmd.AddCommand(todayCmd)

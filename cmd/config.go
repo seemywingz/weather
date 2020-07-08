@@ -21,7 +21,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -31,6 +30,7 @@ import (
 	"github.com/seemywingz/gotoolbox/darksky"
 	"github.com/seemywingz/gotoolbox/gtb"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -39,8 +39,6 @@ var (
 	configFile string
 	config Config
 )
-
-var auto bool
 
 // Config : User Defined Dfaults
 type Config struct {
@@ -61,8 +59,6 @@ var configCmd = &cobra.Command{
 }
 
 func init() {
-
-	configCmd.Flags().BoolVarP(&auto, "auto", "a", false, "set all config values to auto")
 }
 
 func initConfig() {
@@ -76,40 +72,37 @@ func initConfig() {
 	configDir = filepath.Join(homeDir, ".weather")
 	configFile = filepath.Join(configDir, configName)
 
-	if _, err := os.Stat(configFile); err == nil {
-		readConfig()
-		configOverride()
-	} else if os.IsNotExist(err) {
-		fmt.Println("It appears you don't have a saved config file")
-		configOverride()
-		configure()
-	} else {
-		gtb.LoE("Error Accessing Config Directory...", err)
+	viper.SetConfigType("json")
+	viper.AddConfigPath(configDir)
+	viper.SetConfigName(configName)
+
+	viper.SetDefault("units", "auto")
+	viper.SetDefault("location", "auto")
+	viper.SetDefault("apiKey", "89dc0c059f63f8f283768862617b10f6")
+
+	if err := viper.ReadInConfig(); err != nil {
+
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println("It appears you don't have a config file... Using Current Settings")
+			configure()
+			saveConfig()
+		}
 	}
 
+	parseConfig()
 }
 
-func readConfig() {
-	file, _ := ioutil.ReadFile(configFile)
-	_ = json.Unmarshal([]byte(file), &config)
-}
+func parseConfig() {
 
-func configOverride() {
-	if location != "" {
-		config.Location = location
-	}
-	if units != "" {
-		config.Units = units
-	}
-	if config.Units == "" {
-		config.Units = "auto"
-	}
-	if config.Location == "" {
-		config.Location = "auto"
+	config = Config{
+		viper.GetString("units"),
+		viper.GetString("location"),
+		viper.GetString("apiKey"),
 	}
 }
 
 func printCurrentConfig() {
+	parseConfig()
 	fmt.Println("")
 	// fmt.Println("   Weather Config:")
 	// fmt.Println("      File:", configFile)
@@ -122,9 +115,12 @@ func printCurrentConfig() {
 
 func saveConfig() {
 	fmt.Println("\nSaving Config As:", configFile)
+
 	os.MkdirAll(configDir, 0744)
-	jsonData, _ := json.MarshalIndent(config, "", "")
-	_ = ioutil.WriteFile(configFile, jsonData, 0644)
+	_ = ioutil.WriteFile(configFile, make([]byte, 0, 0), 0644)
+
+	gtb.EoE("Error Writing Config", viper.WriteConfig())
+
 	printCurrentConfig()
 }
 
@@ -151,13 +147,6 @@ func confirmSave() {
 }
 
 func configure() {
-
-	// if auto {
-	// 	config.Location = "auto"
-	// 	config.Units = "auto"
-	// 	configAPIKey()
-	// 	return
-	// }
 
 	fmt.Println("\nCurrent Parameters:")
 	confirmSave()
