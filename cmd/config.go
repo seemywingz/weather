@@ -90,6 +90,7 @@ func initConfig() {
 	}
 
 	parseConfig()
+
 }
 
 func parseConfig() {
@@ -140,7 +141,6 @@ func configAPIKey() {
 func confirmSave() {
 	printCurrentConfig()
 	if gtb.Confirm("\nWant to save these parameters?") {
-		configAPIKey()
 		saveConfig()
 		os.Exit(0)
 	}
@@ -152,12 +152,14 @@ func configure() {
 	confirmSave()
 
 	fmt.Println("\nOkay, let's make some choices:")
-	config.Units = gtb.SelectFromMap(darksky.ValidUnits)
+	viper.Set("units", gtb.SelectFromMap(darksky.ValidUnits))
+
 	fmt.Println("\nEnter Your Default Location")
 	fmt.Println("Examples:\n  12569, Beaverton, \"1600 Pennsylvania Ave\"")
 	fmt.Println("  enter \"auto\" and your location will be determined from you public IP address!")
 	fmt.Printf(":")
-	config.Location = gtb.GetInput()
+	viper.Set("location", gtb.GetInput())
+
 	fmt.Println("\nOkay, Great!")
 	configAPIKey()
 	confirmSave()

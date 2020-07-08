@@ -28,11 +28,12 @@ var validArgs = map[string]string{
 func gatherData() (darksky.Data, geolocation.Data) {
 
 	var locationData geolocation.Data
+	var err error
 
 	if config.Location == "" || config.Location == "auto" {
 		locationData, _ = geolocation.FromIP()
 	} else {
-		locationData, _ = geolocation.Locate(location)
+		locationData, err = geolocation.Locate(config.Location)
 	}
 
 	weather, err := darksky.GetData(locationData.Latitude, locationData.Longitude, config.APIKey, config.Units)
