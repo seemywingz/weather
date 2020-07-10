@@ -102,6 +102,10 @@ func displayDaily(weather darksky.DailyData) {
 
 func displayAlerts(alerts []darksky.Alert) {
 	for _, alert := range alerts {
-		fmt.Printf("\n      ⚠️  %v ⚠️\n %v\n", alert.Title, alert.Description)
+		descs := gtb.SplitMulti(alert.Description, ".*")
+		fmt.Printf("\n      ⚠️  %v ⚠️\n", alert.Title)
+		for _, desc := range descs {
+			fmt.Println(desc)
+		}
 	}
 }
