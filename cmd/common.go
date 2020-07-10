@@ -111,5 +111,6 @@ func displayAlerts(alerts []darksky.Alert) {
 				fmt.Println(desc)
 			}
 		}
+
 	}
 }
